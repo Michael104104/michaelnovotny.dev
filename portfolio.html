@@ -1,0 +1,2245 @@
+# Michael Novotny - Professional Portfolio Website
+
+Here's your complete, production-ready portfolio website:
+
+```html
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Michael Novotny - Aspiring Full-Stack Developer & Machine Learning Enthusiast. 15-year-old developer passionate about Python, web development, and AI.">
+    <meta name="keywords" content="Michael Novotny, developer, portfolio, Python, machine learning, full-stack">
+    <meta name="author" content="Michael Novotny">
+    <meta property="og:title" content="Michael Novotny | Developer Portfolio">
+    <meta property="og:description" content="Aspiring Full-Stack Developer & Machine Learning Enthusiast">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://michaelnovotny.dev">
+    <title>Michael Novotny | Developer Portfolio</title>
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* ========================================
+           CSS CUSTOM PROPERTIES & THEME SYSTEM
+        ======================================== */
+        :root {
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            --space-4xl: 6rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-full: 9999px;
+            
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-base: 250ms ease;
+            --transition-slow: 350ms ease;
+            --transition-theme: 400ms ease;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            /* Container */
+            --container-max: 1200px;
+            --container-padding: 1.5rem;
+        }
+        
+        /* Dark Theme (Default) */
+        [data-theme="dark"] {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1a2332;
+            --bg-card: #151d2e;
+            --bg-card-hover: #1a2540;
+            
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-tertiary: #64748b;
+            --text-muted: #475569;
+            
+            --accent-primary: #3b82f6;
+            --accent-primary-hover: #2563eb;
+            --accent-secondary: #10b981;
+            --accent-tertiary: #8b7355;
+            --accent-warm: #a78b6b;
+            
+            --border-color: #1e293b;
+            --border-hover: #334155;
+            
+            --gradient-hero: linear-gradient(135deg, #0a0f1a 0%, #111827 50%, #0f172a 100%);
+            --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            --gradient-card: linear-gradient(145deg, #151d2e 0%, #1a2332 100%);
+            
+            --glow-primary: 0 0 20px rgba(59, 130, 246, 0.3);
+            --glow-secondary: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* Light Theme */
+        [data-theme="light"] {
+            --bg-primary: #fafbfc;
+            --bg-secondary: #f1f5f9;
+            --bg-tertiary: #e2e8f0;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8fafc;
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #64748b;
+            --text-muted: #94a3b8;
+            
+            --accent-primary: #2563eb;
+            --accent-primary-hover: #1d4ed8;
+            --accent-secondary: #059669;
+            --accent-tertiary: #78716c;
+            --accent-warm: #92775c;
+            
+            --border-color: #e2e8f0;
+            --border-hover: #cbd5e1;
+            
+            --gradient-hero: linear-gradient(135deg, #fafbfc 0%, #f1f5f9 50%, #e2e8f0 100%);
+            --gradient-accent: linear-gradient(135deg, #2563eb 0%, #059669 100%);
+            --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            
+            --glow-primary: 0 0 20px rgba(37, 99, 235, 0.2);
+            --glow-secondary: 0 0 20px rgba(5, 150, 105, 0.2);
+        }
+        
+        /* ========================================
+           BASE STYLES & RESET
+        ======================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background var(--transition-theme), color var(--transition-theme);
+            overflow-x: hidden;
+        }
+        
+        /* Selection */
+        ::selection {
+            background: var(--accent-primary);
+            color: white;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: var(--radius-full);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary-hover);
+        }
+        
+        /* ========================================
+           TYPOGRAPHY
+        ======================================== */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+        
+        h1 { font-size: clamp(2.5rem, 6vw, 4rem); }
+        h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+        h3 { font-size: clamp(1.25rem, 3vw, 1.5rem); }
+        
+        p {
+            color: var(--text-secondary);
+        }
+        
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        
+        a:hover {
+            color: var(--accent-primary-hover);
+        }
+        
+        /* ========================================
+           LAYOUT UTILITIES
+        ======================================== */
+        .container {
+            width: 100%;
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: 0 var(--container-padding);
+        }
+        
+        .section {
+            padding: var(--space-4xl) 0;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-3xl);
+        }
+        
+        .section-title {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+        
+        .section-title::before,
+        .section-title::after {
+            content: '';
+            width: 40px;
+            height: 2px;
+            background: var(--gradient-accent);
+            border-radius: var(--radius-full);
+        }
+        
+        .section-subtitle {
+            color: var(--text-tertiary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* ========================================
+           NAVIGATION
+        ======================================== */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 15, 26, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all var(--transition-theme);
+        }
+        
+        [data-theme="light"] .nav {
+            background: rgba(250, 251, 252, 0.9);
+        }
+        
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+        
+        .nav-logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+            list-style: none;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: var(--space-sm) 0;
+            position: relative;
+            transition: color var(--transition-fast);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-accent);
+            transition: width var(--transition-base);
+        }
+        
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .nav-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .nav-toggle:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            box-shadow: var(--glow-primary);
+        }
+        
+        .lang-toggle {
+            font-family: var(--font-primary);
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            padding: var(--space-sm);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .mobile-menu-btn span {
+            width: 24px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: var(--radius-full);
+            transition: all var(--transition-fast);
+        }
+        
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-lg);
+        }
+        
+        .mobile-menu.active {
+            display: block;
+        }
+        
+        .mobile-menu .nav-links {
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        /* ========================================
+           HERO SECTION
+        ======================================== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient-hero);
+            position: relative;
+            overflow: hidden;
+            padding-top: 70px;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+        
+        .hero-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        .hero-orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-primary);
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .hero-orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-secondary);
+            bottom: 20%;
+            right: 15%;
+            animation-delay: -7s;
+        }
+        
+        .hero-orb-3 {
+            width: 200px;
+            height: 200px;
+            background: var(--accent-warm);
+            top: 50%;
+            right: 30%;
+            animation-delay: -14s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(20px, 10px) scale(1.02); }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xl);
+            animation: fadeInDown 0.8s ease forwards;
+        }
+        
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-secondary);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .hero-title {
+            margin-bottom: var(--space-lg);
+            animation: fadeInUp 0.8s ease 0.2s forwards;
+            opacity: 0;
+        }
+        
+        .hero-title-gradient {
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xl);
+            animation: fadeInUp 0.8s ease 0.4s forwards;
+            opacity: 0;
+        }
+        
+        .hero-description {
+            font-size: 1rem;
+            color: var(--text-tertiary);
+            max-width: 600px;
+            margin: 0 auto var(--space-2xl);
+            animation: fadeInUp 0.8s ease 0.6s forwards;
+            opacity: 0;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.8s forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-lg);
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            border: none;
+            font-family: var(--font-primary);
+        }
+        
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: white;
+            box-shadow: var(--glow-primary);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+        
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .scroll-indicator-mouse {
+            width: 24px;
+            height: 38px;
+            border: 2px solid var(--text-muted);
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .scroll-indicator-wheel {
+            width: 4px;
+            height: 8px;
+            background: var(--text-muted);
+            border-radius: var(--radius-full);
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scroll 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+        
+        @keyframes scroll {
+            0%, 100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            50% { opacity: 0.3; transform: translateX(-50%) translateY(10px); }
+        }
+        
+        /* ========================================
+           ABOUT SECTION
+        ======================================== */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3xl);
+            align-items: center;
+        }
+        
+        .about-image {
+            position: relative;
+        }
+        
+        .about-image-wrapper {
+            position: relative;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            aspect-ratio: 4/5;
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+        }
+        
+        .about-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient-accent);
+            opacity: 0.1;
+        }
+        
+        .about-image-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .about-initials {
+            font-size: 6rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .about-decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 20px;
+            left: 20px;
+            border: 2px solid var(--accent-primary);
+            border-radius: var(--radius-xl);
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .about-content h2 {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .about-text {
+            margin-bottom: var(--space-lg);
+            line-height: 1.8;
+        }
+        
+        .about-highlights {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+        }
+        
+        .about-highlight {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+        }
+        
+        .about-highlight i {
+            color: var(--accent-secondary);
+        }
+        
+        /* ========================================
+           SKILLS SECTION
+        ======================================== */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-xl);
+        }
+        
+        .skill-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-accent);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        
+        .skill-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .skill-card:hover::before {
+            opacity: 1;
+        }
+        
+        .skill-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-lg);
+            color: var(--accent-primary);
+        }
+        
+        .skill-card:nth-child(2) .skill-icon {
+            color: var(--accent-secondary);
+        }
+        
+        .skill-card:nth-child(3) .skill-icon {
+            color: var(--accent-warm);
+        }
+        
+        .skill-card h3 {
+            margin-bottom: var(--space-md);
+        }
+        
+        .skill-card p {
+            font-size: 0.9rem;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+        
+        .skill-tag {
+            padding: var(--space-xs) var(--space-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+        
+        .skill-tag:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+        
+        /* ========================================
+           PROJECTS / WORKING ON SECTION
+        ======================================== */
+        .projects-container {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .projects-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+        
+        .projects-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .projects-title i {
+            color: var(--accent-secondary);
+        }
+        
+        .projects-refresh {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .projects-refresh:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        .projects-refresh.loading i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .projects-content {
+            min-height: 150px;
+        }
+        
+        .project-item {
+            display: flex;
+            gap: var(--space-lg);
+            padding: var(--space-lg);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-md);
+            transition: all var(--transition-fast);
+        }
+        
+        .project-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .project-item:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .project-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient-accent);
+            border-radius: var(--radius-md);
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .project-info h4 {
+            margin-bottom: var(--space-xs);
+        }
+        
+        .project-info p {
+            font-size: 0.9rem;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .project-meta {
+            display: flex;
+            gap: var(--space-md);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .project-meta span {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .projects-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-2xl);
+            color: var(--text-tertiary);
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: var(--space-md);
+        }
+        
+        /* ========================================
+           EDUCATION SECTION
+        ======================================== */
+        .education-timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .education-item {
+            display: flex;
+            gap: var(--space-xl);
+            position: relative;
+            padding-bottom: var(--space-2xl);
+        }
+        
+        .education-item:last-child {
+            padding-bottom: 0;
+        }
+        
+        .education-marker {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient-accent);
+            border-radius: 50%;
+            color: white;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .education-item:not(:last-child) .education-marker::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: calc(100% + var(--space-2xl));
+            background: var(--border-color);
+        }
+        
+        .education-content {
+            flex: 1;
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            transition: all var(--transition-base);
+        }
+        
+        .education-content:hover {
+            border-color: var(--border-hover);
+            transform: translateX(5px);
+        }
+        
+        .education-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-md);
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+        
+        .education-badge {
+            padding: var(--space-xs) var(--space-md);
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-secondary);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .education-badge.completed {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-primary);
+        }
+        
+        .education-content p {
+            font-size: 0.9rem;
+        }
+        
+        .education-placeholder {
+            border-style: dashed;
+            opacity: 0.6;
+        }
+        
+        .education-placeholder .education-marker {
+            background: var(--bg-tertiary);
+            border: 2px dashed var(--border-color);
+            color: var(--text-muted);
+        }
+        
+        /* ========================================
+           CONTACT SECTION
+        ======================================== */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3xl);
+        }
+        
+        .contact-info h2 {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .contact-info > p {
+            margin-bottom: var(--space-2xl);
+        }
+        
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+        
+        .contact-link:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateX(5px);
+        }
+        
+        .contact-link i {
+            width: 24px;
+            color: var(--accent-primary);
+        }
+        
+        .contact-form-wrapper {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+        }
+        
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        
+        .form-input,
+        .form-textarea {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .form-error {
+            color: #ef4444;
+            font-size: 0.8rem;
+            display: none;
+        }
+        
+        .form-group.error .form-input,
+        .form-group.error .form-textarea {
+            border-color: #ef4444;
+        }
+        
+        .form-group.error .form-error {
+            display: block;
+        }
+        
+        .form-submit {
+            width: 100%;
+            padding: var(--space-md) var(--space-xl);
+        }
+        
+        .form-status {
+            text-align: center;
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            display: none;
+        }
+        
+        .form-status.success {
+            display: block;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-secondary);
+        }
+        
+        .form-status.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        /* ========================================
+           FOOTER
+        ======================================== */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-2xl) 0;
+        }
+        
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--space-lg);
+        }
+        
+        .footer-text {
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+        
+        .footer-socials {
+            display: flex;
+            gap: var(--space-md);
+        }
+        
+        .footer-social {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+        
+        .footer-social:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-3px);
+        }
+        
+        /* ========================================
+           RESPONSIVE DESIGN
+        ======================================== */
+        @media (max-width: 1024px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-2xl);
+            }
+            
+            .about-image {
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            :root {
+                --container-padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: flex;
+            }
+            
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+            
+            .about-highlights {
+                grid-template-columns: 1fr;
+            }
+            
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .education-item {
+                flex-direction: column;
+                gap: var(--space-md);
+            }
+            
+            .education-marker::after {
+                display: none;
+            }
+            
+            .section-title::before,
+            .section-title::after {
+                width: 20px;
+            }
+            
+            .project-item {
+                flex-direction: column;
+                gap: var(--space-md);
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-badge {
+                font-size: 0.75rem;
+                padding: var(--space-xs) var(--space-md);
+            }
+            
+            .nav-controls {
+                gap: var(--space-xs);
+            }
+            
+            .nav-toggle {
+                width: 36px;
+                height: 36px;
+            }
+        }
+        
+        /* ========================================
+           ACCESSIBILITY
+        ======================================== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            html {
+                scroll-behavior: auto;
+            }
+        }
+        
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        :focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+        <div class="container nav-container">
+            <a href="#" class="nav-logo" aria-label="Michael Novotny - Home">MN</a>
+            
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#about" class="nav-link" data-i18n="nav.about">About</a></li>
+                <li><a href="#skills" class="nav-link" data-i18n="nav.skills">Skills</a></li>
+                <li><a href="#projects" class="nav-link" data-i18n="nav.projects">Projects</a></li>
+                <li><a href="#education" class="nav-link" data-i18n="nav.education">Education</a></li>
+                <li><a href="#contact" class="nav-link" data-i18n="nav.contact">Contact</a></li>
+            </ul>
+            
+            <div class="nav-controls">
+                <button class="nav-toggle lang-toggle" id="langToggle" aria-label="Toggle language">
+                    EN
+                </button>
+                <button class="nav-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <i data-lucide="moon" aria-hidden="true"></i>
+                </button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            
+            <div class="mobile-menu" id="mobileMenu">
+                <ul class="nav-links">
+                    <li><a href="#about" class="nav-link" data-i18n="nav.about">About</a></li>
+                    <li><a href="#skills" class="nav-link" data-i18n="nav.skills">Skills</a></li>
+                    <li><a href="#projects" class="nav-link" data-i18n="nav.projects">Projects</a></li>
+                    <li><a href="#education" class="nav-link" data-i18n="nav.education">Education</a></li>
+                    <li><a href="#contact" class="nav-link" data-i18n="nav.contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg" aria-hidden="true">
+            <div class="hero-orb hero-orb-1"></div>
+            <div class="hero-orb hero-orb-2"></div>
+            <div class="hero-orb hero-orb-3"></div>
+        </div>
+        
+        <div class="container hero-content">
+            <div class="hero-badge">
+                <span class="hero-badge-dot" aria-hidden="true"></span>
+                <span data-i18n="hero.badge">Available for opportunities</span>
+            </div>
+            
+            <h1 class="hero-title">
+                <span data-i18n="hero.greeting">Hi, I'm</span> <span class="hero-title-gradient">Michael Novotny</span>
+            </h1>
+            
+            <p class="hero-subtitle" data-i18n="hero.subtitle">
+                Aspiring Full-Stack Developer & Machine Learning Enthusiast
+            </p>
+            
+            <p class="hero-description" data-i18n="hero.description">
+                A 15-year-old developer passionate about building intelligent solutions. 
+                I love turning complex problems into elegant code, with a special focus on 
+                Python and the fascinating world of machine learning.
+            </p>
+            
+            <div class="hero-cta">
+                <a href="#projects" class="btn btn-primary">
+                    <i data-lucide="code-2" aria-hidden="true"></i>
+                    <span data-i18n="hero.cta.projects">View My Work</span>
+                </a>
+                <a href="#contact" class="btn btn-secondary">
+                    <i data-lucide="mail" aria-hidden="true"></i>
+                    <span data-i18n="hero.cta.contact">Get In Touch</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="scroll-indicator" aria-hidden="true">
+            <div class="scroll-indicator-mouse">
+                <div class="scroll-indicator-wheel"></div>
+            </div>
+            <span data-i18n="hero.scroll">Scroll</span>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-image">
+                    <div class="about-image-wrapper">
+                        <div class="about-image-placeholder"></div>
+                        <div class="about-image-overlay">
+                            <span class="about-initials">MN</span>
+                        </div>
+                    </div>
+                    <div class="about-decoration" aria-hidden="true"></div>
+                </div>
+                
+                <div class="about-content">
+                    <h2 data-i18n="about.title">About Me</h2>
+                    <p class="about-text" data-i18n="about.text1">
+                        I'm a 15-year-old developer from Germany who discovered a passion for programming 
+                        and hasn't looked back since. What started as curiosity about how software works 
+                        has evolved into a dedicated pursuit of full-stack development and machine learning.
+                    </p>
+                    <p class="about-text" data-i18n="about.text2">
+                        I thrive on learning new technologies and tackling challenging problems. My current 
+                        focus is on building robust backend systems with Python while exploring the 
+                        possibilities of AI and machine learning. When I'm not coding, you'll find me 
+                        on my racing bicycle, hiking through nature, or playing baseball.
+                    </p>
+                    
+                    <div class="about-highlights">
+                        <div class="about-highlight">
+                            <i data-lucide="code" aria-hidden="true"></i>
+                            <span data-i18n="about.highlight1">Full-Stack Development</span>
+                        </div>
+                        <div class="about-highlight">
+                            <i data-lucide="brain" aria-hidden="true"></i>
+                            <span data-i18n="about.highlight2">Machine Learning</span>
+                        </div>
+                        <div class="about-highlight">
+                            <i data-lucide="database" aria-hidden="true"></i>
+                            <span data-i18n="about.highlight3">Backend & Databases</span>
+                        </div>
+                        <div class="about-highlight">
+                            <i data-lucide="lightbulb" aria-hidden="true"></i>
+                            <span data-i18n="about.highlight4">Problem Solving</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="section" id="skills">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" data-i18n="skills.title">Skills & Technologies</h2>
+                <p class="section-subtitle" data-i18n="skills.subtitle">
+                    The tools and technologies I use to bring ideas to life
+                </p>
+            </div>
+            
+            <div class="skills-grid">
+                <article class="skill-card">
+                    <div class="skill-icon">
+                        <i data-lucide="palette" aria-hidden="true"></i>
+                    </div>
+                    <h3 data-i18n="skills.frontend.title">Frontend Development</h3>
+                    <p data-i18n="skills.frontend.description">
+                        Creating responsive, accessible, and visually appealing user interfaces 
+                        that work across all devices.
+                    </p>
+                    <div class="skill-tags">
+                        <span class="skill-tag">HTML5</span>
+                        <span class="skill-tag">CSS3</span>
+                        <span class="skill-tag">JavaScript</span>
+                        <span class="skill-tag">Responsive Design</span>
+                    </div>
+                </article>
+                
+                <article class="skill-card">
+                    <div class="skill-icon">
+                        <i data-lucide="server" aria-hidden="true"></i>
+                    </div>
+                    <h3 data-i18n="skills.backend.title">Backend Development</h3>
+                    <p data-i18n="skills.backend.description">
+                        Building robust server-side applications and APIs that power 
+                        modern web applications.
+                    </p>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">SQL</span>
+                        <span class="skill-tag">Databases</span>
+                        <span class="skill-tag">REST APIs</span>
+                    </div>
+                </article>
+                
+                <article class="skill-card">
+                    <div class="skill-icon">
+                        <i data-lucide="brain-circuit" aria-hidden="true"></i>
+                    </div>
+                    <h3 data-i18n="skills.ml.title">Machine Learning</h3>
+                    <p data-i18n="skills.ml.description">
+                        Exploring the world of AI to build intelligent systems that 
+                        learn and adapt from data.
+                    </p>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Python ML</span>
+                        <span class="skill-tag">Data Analysis</span>
+                        <span class="skill-tag">Model Training</span>
+                        <span class="skill-tag">NumPy/Pandas</span>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="section" id="projects">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" data-i18n="projects.title">What I'm Working On</h2>
+                <p class="section-subtitle" data-i18n="projects.subtitle">
+                    Current projects and recent activity from my GitHub
+                </p>
+            </div>
+            
+            <div class="projects-container">
+                <div class="projects-header">
+                    <div class="projects-title">
+                        <i data-lucide="github" aria-hidden="true"></i>
+                        <h3 data-i18n="projects.github.title">GitHub Activity</h3>
+                    </div>
+                    <button class="projects-refresh" id="refreshProjects" aria-label="Refresh projects">
+                        <i data-lucide="refresh-cw" aria-hidden="true"></i>
+                        <span data-i18n="projects.refresh">Refresh</span>
+                    </button>
+                </div>
+                
+                <div class="projects-content" id="projectsContent">
+                    <div class="projects-loading">
+                        <div class="loading-spinner"></div>
+                        <span data-i18n="projects.loading">Loading projects...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section class="section" id="education">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" data-i18n="education.title">Education & Certifications</h2>
+                <p class="section-subtitle" data-i18n="education.subtitle">
+                    My learning journey and professional development
+                </p>
+            </div>
+            
+            <div class="education-timeline">
+                <div class="education-item">
+                    <div class="education-marker">
+                        <i data-lucide="graduation-cap" aria-hidden="true"></i>
+                    </div>
+                    <div class="education-content">
+                        <div class="education-header">
+                            <h3>CS50x</h3>
+                            <span class="education-badge" data-i18n="education.status.progress">In Progress</span>
+                        </div>
+                        <p data-i18n="education.cs50.description">
+                            Harvard's Introduction to Computer Science - A comprehensive course covering 
+                            programming fundamentals, algorithms, data structures, web development, and more. 
+                            Building a strong foundation in computer science principles.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="education-item education-placeholder">
+                    <div class="education-marker">
+                        <i data-lucide="plus" aria-hidden="true"></i>
+                    </div>
+                    <div class="education-content">
+                        <div class="education-header">
+                            <h3 data-i18n="education.future.title">More Coming Soon</h3>
+                        </div>
+                        <p data-i18n="education.future.description">
+                            Continuously expanding my knowledge through courses, certifications, 
+                            and hands-on projects. Stay tuned for updates!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" data-i18n="contact.title">Get In Touch</h2>
+                <p class="section-subtitle" data-i18n="contact.subtitle">
+                    Have a project in mind or just want to say hi? I'd love to hear from you!
+                </p>
+            </div>
+            
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h2 data-i18n="contact.info.title">Let's Connect</h2>
+                    <p data-i18n="contact.info.description">
+                        Whether you have a question, a project idea, or just want to connect, 
+                        feel free to reach out. I'm always open to discussing new opportunities 
+                        and interesting projects.
+                    </p>
+                    
+                    <div class="contact-links">
+                        <a href="mailto:michael.novotny2010@gmail.com" class="contact-link" target="_blank" rel="noopener noreferrer">
+                            <i data-lucide="mail" aria-hidden="true"></i>
+                            <span>michael.novotny2010@gmail.com</span>
+                        </a>
+                        <a href="https://github.com/Michael104104" class="contact-link" target="_blank" rel="noopener noreferrer">
+                            <i data-lucide="github" aria-hidden="true"></i>
+                            <span>github.com/Michael104104</span>
+                        </a>
+                        <a href="https://discord.com/users/michael_1040" class="contact-link" target="_blank" rel="noopener noreferrer">
+                            <i data-lucide="message-circle" aria-hidden="true"></i>
+                            <span>Discord: michael_1040</span>
+                        </a>
+                        <a href="https://instagram.com/michael_1040" class="contact-link" target="_blank" rel="noopener noreferrer">
+                            <i data-lucide="instagram" aria-hidden="true"></i>
+                            <span>@michael_1040</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="contact-form-wrapper">
+                    <form class="contact-form" id="contactForm" action="https://formspree.io/f/xpwzgvrd" method="POST">
+                        <div class="form-group">
+                            <label for="name" class="form-label" data-i18n="contact.form.name">Your Name</label>
+                            <input type="text" id="name" name="name" class="form-input" placeholder="John Doe" required>
+                            <span class="form-error" data-i18n="contact.form.nameError">Please enter your name</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label" data-i18n="contact.form.email">Your Email</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="john@example.com" required>
+                            <span class="form-error" data-i18n="contact.form.emailError">Please enter a valid email</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message" class="form-label" data-i18n="contact.form.message">Your Message</label>
+                            <textarea id="message" name="message" class="form-textarea" placeholder="Hi Michael, I'd like to..." required></textarea>
+                            <span class="form-error" data-i18n="contact.form.messageError">Please enter your message</span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary form-submit">
+                            <i data-lucide="send" aria-hidden="true"></i>
+                            <span data-i18n="contact.form.send">Send Message</span>
+                        </button>
+                        
+                        <div class="form-status" id="formStatus"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <p class="footer-text">
+                <span data-i18n="footer.copyright">© 2025 Michael Novotny. Built with</span>
+                <span aria-label="love">❤️</span>
+                <span data-i18n="footer.and">and lots of</span>
+                <span aria-label="coffee">☕</span>
+            </p>
+            
+            <div class="footer-socials">
+                <a href="https://github.com/Michael104104" class="footer-social" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                    <i data-lucide="github" aria-hidden="true"></i>
+                </a>
+                <a href="mailto:michael.novotny2010@gmail.com" class="footer-social" aria-label="Email">
+                    <i data-lucide="mail" aria-hidden="true"></i>
+                </a>
+                <a href="https://instagram.com/michael_1040" class="footer-social" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                    <i data-lucide="instagram" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ========================================
+        // TRANSLATIONS
+        // ========================================
+        const translations = {
+            en: {
+                'nav.about': 'About',
+                'nav.skills': 'Skills',
+                'nav.projects': 'Projects',
+                'nav.education': 'Education',
+                'nav.contact': 'Contact',
+                'hero.badge': 'Available for opportunities',
+                'hero.greeting': "Hi, I'm",
+                'hero.subtitle': 'Aspiring Full-Stack Developer & Machine Learning Enthusiast',
+                'hero.description': "A 15-year-old developer passionate about building intelligent solutions. I love turning complex problems into elegant code, with a special focus on Python and the fascinating world of machine learning.",
+                'hero.cta.projects': 'View My Work',
+                'hero.cta.contact': 'Get In Touch',
+                'hero.scroll': 'Scroll',
+                'about.title': 'About Me',
+                'about.text1': "I'm a 15-year-old developer from Germany who discovered a passion for programming and hasn't looked back since. What started as curiosity about how software works has evolved into a dedicated pursuit of full-stack development and machine learning.",
+                'about.text2': "I thrive on learning new technologies and tackling challenging problems. My current focus is on building robust backend systems with Python while exploring the possibilities of AI and machine learning. When I'm not coding, you'll find me on my racing bicycle, hiking through nature, or playing baseball.",
+                'about.highlight1': 'Full-Stack Development',
+                'about.highlight2': 'Machine Learning',
+                'about.highlight3': 'Backend & Databases',
+                'about.highlight4': 'Problem Solving',
+                'skills.title': 'Skills & Technologies',
+                'skills.subtitle': 'The tools and technologies I use to bring ideas to life',
+                'skills.frontend.title': 'Frontend Development',
+                'skills.frontend.description': 'Creating responsive, accessible, and visually appealing user interfaces that work across all devices.',
+                'skills.backend.title': 'Backend Development',
+                'skills.backend.description': 'Building robust server-side applications and APIs that power modern web applications.',
+                'skills.ml.title': 'Machine Learning',
+                'skills.ml.description': 'Exploring the world of AI to build intelligent systems that learn and adapt from data.',
+                'projects.title': "What I'm Working On",
+                'projects.subtitle': 'Current projects and recent activity from my GitHub',
+                'projects.github.title': 'GitHub Activity',
+                'projects.refresh': 'Refresh',
+                'projects.loading': 'Loading projects...',
+                'projects.error': 'Unable to load projects. Please try again later.',
+                'projects.noRepos': 'No public repositories found.',
+                'projects.fallback.title': 'Portfolio Website',
+                'projects.fallback.description': 'Building my personal portfolio to showcase my skills and projects.',
+                'education.title': 'Education & Certifications',
+                'education.subtitle': 'My learning journey and professional development',
+                'education.status.progress': 'In Progress',
+                'education.status.completed': 'Completed',
+                'education.cs50.description': "Harvard's Introduction to Computer Science - A comprehensive course covering programming fundamentals, algorithms, data structures, web development, and more. Building a strong foundation in computer science principles.",
+                'education.future.title': 'More Coming Soon',
+                'education.future.description': 'Continuously expanding my knowledge through courses, certifications, and hands-on projects. Stay tuned for updates!',
+                'contact.title': 'Get In Touch',
+                'contact.subtitle': "Have a project in mind or just want to say hi? I'd love to hear from you!",
+                'contact.info.title': "Let's Connect",
+                'contact.info.description': "Whether you have a question, a project idea, or just want to connect, feel free to reach out. I'm always open to discussing new opportunities and interesting projects.",
+                'contact.form.name': 'Your Name',
+                'contact.form.email': 'Your Email',
+                'contact.form.message': 'Your Message',
+                'contact.form.send': 'Send Message',
+                'contact.form.nameError': 'Please enter your name',
+                'contact.form.emailError': 'Please enter a valid email',
+                'contact.form.messageError': 'Please enter your message',
+                'contact.form.success': 'Message sent successfully! I\'ll get back to you soon.',
+                'contact.form.error': 'Something went wrong. Please try again.',
+                'footer.copyright': '© 2025 Michael Novotny. Built with',
+                'footer.and': 'and lots of'
+            },
+            de: {
+                'nav.about': 'Über Mich',
+                'nav.skills': 'Fähigkeiten',
+                'nav.projects': 'Projekte',
+                'nav.education': 'Bildung',
+                'nav.contact': 'Kontakt',
+                'hero.badge': 'Offen für neue Möglichkeiten',
+                'hero.greeting': 'Hallo, ich bin',
+                'hero.subtitle': 'Angehender Full-Stack-Entwickler & Machine Learning Enthusiast',
+                'hero.description': 'Ein 15-jähriger Entwickler mit Leidenschaft für intelligente Lösungen. Ich liebe es, komplexe Probleme in eleganten Code zu verwandeln, mit besonderem Fokus auf Python und die faszinierende Welt des maschinellen Lernens.',
+                'hero.cta.projects': 'Meine Arbeit',
+                'hero.cta.contact': 'Kontakt aufnehmen',
+                'hero.scroll': 'Scrollen',
+                'about.title': 'Über Mich',
+                'about.text1': 'Ich bin ein 15-jähriger Entwickler aus Deutschland, der seine Leidenschaft fürs Programmieren entdeckt hat und seitdem nicht mehr davon loskommt. Was als Neugier darüber begann, wie Software funktioniert, hat sich zu einem engagierten Streben nach Full-Stack-Entwicklung und maschinellem Lernen entwickelt.',
+                'about.text2': 'Ich lebe davon, neue Technologien zu erlernen und herausfordernde Probleme anzugehen. Mein aktueller Fokus liegt auf dem Aufbau robuster Backend-Systeme mit Python, während ich die Möglichkeiten von KI und maschinellem Lernen erkunde. Wenn ich nicht programmiere, findet man mich auf meinem Rennrad, beim Wandern in der Natur oder beim Baseball spielen.',
+                'about.highlight1': 'Full-Stack-Entwicklung',
+                'about.highlight2': 'Maschinelles Lernen',
+                'about.highlight3': 'Backend & Datenbanken',
+                'about.highlight4': 'Problemlösung',
+                'skills.title': 'Fähigkeiten & Technologien',
+                'skills.subtitle': 'Die Werkzeuge und Technologien, die ich nutze, um Ideen zum Leben zu erwecken',
+                'skills.frontend.title': 'Frontend-Entwicklung',
+                'skills.frontend.description': 'Erstellung responsiver, zugänglicher und visuell ansprechender Benutzeroberflächen, die auf allen Geräten funktionieren.',
+                'skills.backend.title': 'Backend-Entwicklung',
+                'skills.backend.description': 'Aufbau robuster serverseitiger Anwendungen und APIs, die moderne Webanwendungen antreiben.',
+                'skills.ml.title': 'Maschinelles Lernen',
+                'skills.ml.description': 'Erkundung der Welt der KI, um intelligente Systeme zu entwickeln, die aus Daten lernen und sich anpassen.',
+                'projects.title': 'Woran ich arbeite',
+                'projects.subtitle': 'Aktuelle Projekte und neueste Aktivitäten von meinem GitHub',
+                'projects.github.title': 'GitHub-Aktivität',
+                'projects.refresh': 'Aktualisieren',
+                'projects.loading': 'Projekte werden geladen...',
+                'projects.error': 'Projekte konnten nicht geladen werden. Bitte versuchen Sie es später erneut.',
+                'projects.noRepos': 'Keine öffentlichen Repositories gefunden.',
+                'projects.fallback.title': 'Portfolio-Website',
+                'projects.fallback.description': 'Aufbau meines persönlichen Portfolios zur Präsentation meiner Fähigkeiten und Projekte.',
+                'education.title': 'Bildung & Zertifizierungen',
+                'education.subtitle': 'Mein Lernweg und meine berufliche Entwicklung',
+                'education.status.progress': 'In Bearbeitung',
+                'education.status.completed': 'Abgeschlossen',
+                'education.cs50.description': 'Harvards Einführung in die Informatik - Ein umfassender Kurs über Programmiergrundlagen, Algorithmen, Datenstrukturen, Webentwicklung und mehr. Aufbau einer soliden Grundlage in den Prinzipien der Informatik.',
+                'education.future.title': 'Mehr kommt bald',
+                'education.future.description': 'Kontinuierliche Erweiterung meines Wissens durch Kurse, Zertifizierungen und praktische Projekte. Bleiben Sie auf dem Laufenden!',
+                'contact.title': 'Kontakt aufnehmen',
+                'contact.subtitle': 'Haben Sie ein Projekt im Sinn oder möchten einfach Hallo sagen? Ich würde mich freuen, von Ihnen zu hören!',
+                'contact.info.title': 'Lassen Sie uns verbinden',
+                'contact.info.description': 'Ob Sie eine Frage, eine Projektidee haben oder einfach nur Kontakt aufnehmen möchten - zögern Sie nicht, sich zu melden. Ich bin immer offen für neue Möglichkeiten und interessante Projekte.',
+                'contact.form.name': 'Ihr Name',
+                'contact.form.email': 'Ihre E-Mail',
+                'contact.form.message': 'Ihre Nachricht',
+                'contact.form.send': 'Nachricht senden',
+                'contact.form.nameError': 'Bitte geben Sie Ihren Namen ein',
+                'contact.form.emailError': 'Bitte geben Sie eine gültige E-Mail ein',
+                'contact.form.messageError': 'Bitte geben Sie Ihre Nachricht ein',
+                'contact.form.success': 'Nachricht erfolgreich gesendet! Ich melde mich bald bei Ihnen.',
+                'contact.form.error': 'Etwas ist schiefgegangen. Bitte versuchen Sie es erneut.',
+                'footer.copyright': '© 2025 Michael Novotny. Erstellt mit',
+                'footer.and': 'und viel'
+            }
+        };
+
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function setCookie(name, value, days = 365) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/;SameSite=Lax`;
+        }
+
+        // ========================================
+        // THEME MANAGEMENT
+        // ========================================
+        const themeToggle = document.getElementById('themeToggle');
+        
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            setCookie('theme', theme);
+            updateThemeIcon(theme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = themeToggle.querySelector('i');
+            if (icon) {
+                icon.setAttribute('data-lucide', theme === 'dark' ? 'moon' : 'sun');
+                lucide.createIcons();
+            }
+        }
+
+        function initTheme() {
+            const savedTheme = getCookie('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'dark'); // Default to dark
+            setTheme(theme);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+
+        // ========================================
+        // LANGUAGE MANAGEMENT
+        // ========================================
+        const langToggle = document.getElementById('langToggle');
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            setCookie('lang', lang);
+            langToggle.textContent = lang.toUpperCase();
+            document.documentElement.setAttribute('lang', lang);
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            
+            // Update placeholders
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const messageInput = document.getElementById('message');
+            
+            if (lang === 'de') {
+                nameInput.placeholder = 'Max Mustermann';
+                emailInput.placeholder = 'max@beispiel.de';
+                messageInput.placeholder = 'Hallo Michael, ich würde gerne...';
+            } else {
+                nameInput.placeholder = 'John Doe';
+                emailInput.placeholder = 'john@example.com';
+                messageInput.placeholder = "Hi Michael, I'd like to...";
+            }
+        }
+
+        function initLanguage() {
+            const savedLang = getCookie('lang') || 'en';
+            setLanguage(savedLang);
+        }
+
+        langToggle.addEventListener('click', () => {
+            const newLang = currentLang === 'en' ? 'de' : 'en';
+            setLanguage(newLang);
+        });
+
+        // ========================================
+        // MOBILE MENU
+        // ========================================
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.toggle('active');
+            mobileMenuBtn.setAttribute('aria-expanded', isOpen);
+        });
+
+        // Close mobile menu on link click
+        mobileMenu.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        // ========================================
+        // SCROLL ANIMATIONS
+        // ========================================
+        function initScrollAnimations() {
+            const sections = document.querySelectorAll('.section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        }
+
+        // ========================================
+        // GITHUB INTEGRATION
+        // ========================================
+        const projectsContent = document.getElementById('projectsContent');
+        const refreshBtn = document.getElementById('refreshProjects');
+
+        async function fetchGitHubProjects() {
+            const loadingHTML = `
+                <div class="projects-loading">
+                    <div class="loading-spinner"></div>
+                    <span data-i18n="projects.loading">${translations[currentLang]['projects.loading']}</span>
+                </div>
+            `;
+            projectsContent.innerHTML = loadingHTML;
+            refreshBtn.classList.add('loading');
+
+            try {
+                // Fetch user repos
+                const response = await fetch('https://api.github.com/users/Michael104104/repos?sort=updated&per_page=5');
+                
+                if (!response.ok) {
+                    throw new Error('GitHub API error');
+                }
+
+                const repos = await response.json();
+
+                if (repos.length === 0) {
+                    projectsContent.innerHTML = `
+                        <div class="projects-loading">
+                            <i data-lucide="folder-open" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <span>${translations[currentLang]['projects.noRepos']}</span>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+
+                let projectsHTML = '';
+                
+                repos.forEach(repo => {
+                    const updatedDate = new Date(repo.updated_at).toLocaleDateString(currentLang === 'de' ? 'de-DE' : 'en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+
+                    projectsHTML += `
+                        <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="project-item">
+                            <div class="project-icon">
+                                <i data-lucide="folder-git-2" aria-hidden="true"></i>
+                            </div>
+                            <div class="project-info">
+                                <h4>${repo.name}</h4>
+                                <p>${repo.description || (currentLang === 'de' ? 'Keine Beschreibung verfügbar' : 'No description available')}</p>
+                                <div class="project-meta">
+                                    ${repo.language ? `<span><i data-lucide="code" aria-hidden="true"></i> ${repo.language}</span>` : ''}
+                                    <span><i data-lucide="star" aria-hidden="true"></i> ${repo.stargazers_count}</span>
+                                    <span><i data-lucide="git-fork" aria-hidden="true"></i> ${repo.forks_count}</span>
+                                    <span><i data-lucide="calendar" aria-hidden="true"></i> ${updatedDate}</span>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                });
+
+                projectsContent.innerHTML = projectsHTML;
+                lucide.createIcons();
+
+            } catch (error) {
+                console.error('Error fetching GitHub data:', error);
+                
+                // Fallback content
+                projectsContent.innerHTML = `
+                    <div class="project-item">
+                        <div class="project-icon">
+                            <i data-lucide="globe" aria-hidden="true"></i>
+                        </div>
+                        <div class="project-info">
+                            <h4>${translations[currentLang]['projects.fallback.title']}</h4>
+                            <p>${translations[currentLang]['projects.fallback.description']}</p>
+                            <div class="project-meta">
+                                <span><i data-lucide="code" aria-hidden="true"></i> HTML/CSS/JS</span>
+                                <span><i data-lucide="calendar" aria-hidden="true"></i> 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-icon">
+                            <i data-lucide="brain" aria-hidden="true"></i>
+                        </div>
+                        <div class="project-info">
+                            <h4>Machine Learning Projects</h4>
+                            <p>${currentLang === 'de' ? 'Erkundung von ML-Konzepten und Aufbau intelligenter Systeme mit Python.' : 'Exploring ML concepts and building intelligent systems with Python.'}</p>
+                            <div class="project-meta">
+                                <span><i data-lucide="code" aria-hidden="true"></i> Python</span>
+                                <span><i data-lucide="calendar" aria-hidden="true"></i> 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-icon">
+                            <i data-lucide="database" aria-hidden="true"></i>
+                        </div>
+                        <div class="project-info">
+                            <h4>Backend API Development</h4>
+                            <p>${currentLang === 'de' ? 'RESTful APIs und Datenbankintegration mit Python und SQL.' : 'Building RESTful APIs and database integrations with Python and SQL.'}</p>
+                            <div class="project-meta">
+                                <span><i data-lucide="code" aria-hidden="true"></i> Python/SQL</span>
+                                <span><i data-lucide="calendar" aria-hidden="true"></i> 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+            } finally {
+                refreshBtn.classList.remove('loading');
+            }
+        }
+
+        refreshBtn.addEventListener('click', fetchGitHubProjects);
+
+        // ========================================
+        // CONTACT FORM
+        // ========================================
+        const contactForm = document.getElementById('contactForm');
+        const formStatus = document.getElementById('formStatus');
+
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Reset errors
+            document.querySelectorAll('.form-group').forEach(group => {
+                group.classList.remove('error');
+            });
+            formStatus.className = 'form-status';
+            formStatus.style.display = 'none';
+
+            // Validate
+            const name = document.getElementById('name');
+            const email = document.getElementById('email');
+            const message = document.getElementById('message');
+            let isValid = true;
+
+            if (!name.value.trim()) {
+                name.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (!email.value.trim() || !email.validity.valid) {
+                email.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (!message.value.trim()) {
+                message.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            // Submit form
+            const submitBtn = contactForm.querySelector('.form-submit');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = `<div class="loading-spinner" style="width: 20px; height: 20px; border-width: 2px; margin: 0;"></div>`;
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData(contactForm);
+                const response = await fetch(contactForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    formStatus.textContent = translations[currentLang]['contact.form.success'];
+                    formStatus.className = 'form-status success';
+                    formStatus.style.display = 'block';
+                    contactForm.reset();
+                } else {
+                    throw new Error('Form submission failed');
+                }
+            } catch (error) {
+                console.error('Form error:', error);
+                formStatus.textContent = translations[currentLang]['contact.form.error'];
+                formStatus.className = 'form-status error';
+                formStatus.style.display = 'block';
+            } finally {
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+                lucide.createIcons();
+            }
+        });
+
+        // ========================================
+        // SMOOTH SCROLL FOR NAV LINKS
+        // ========================================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ========================================
+        // NAVBAR SCROLL EFFECT
+        // ========================================
+        let lastScroll = 0;
+        const nav = document.querySelector('.nav');
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                nav.style.boxShadow = 'var(--shadow-lg)';
+            } else {
+                nav.style.boxShadow = 'none';
+            }
+            
+            lastScroll = currentScroll;
+        });
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Initialize theme
+            initTheme();
+            
+            // Initialize language
+            initLanguage();
+            
+            // Initialize scroll animations
+            initScrollAnimations();
+            
+            // Fetch GitHub projects
+            fetchGitHubProjects();
+            
+            // Add loaded class to body for initial animations
+            document.body.classList.add('loaded');
+        });
+
+        // Handle visibility change to refresh icons
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+</html>
