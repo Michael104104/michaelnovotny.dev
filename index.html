@@ -1,12 +1,388 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-  <title>Michael’s Website Test 2</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michael Novotny - Developer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a5568;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent: #60a5fa;
+            --accent-hover: #3b82f6;
+            --border: #334155;
+            --card-bg: #1e293b;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .hero {
+            padding: 100px 0 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .hero .bio {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+
+        section {
+            padding: 60px 0;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .skill-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px var(--shadow);
+            border-color: var(--accent);
+        }
+
+        .skill-card h3 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .skill-card ul {
+            list-style: none;
+        }
+
+        .skill-card li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .skill-card li:before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .contact-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+
+        .contact-card .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .contact-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .contact-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
-<body>
-  <h1>Success! This site works.</h1>
+<body data-theme="light">
+    <header>
+        <nav class="container">
+            <div class="logo">MN</div>
+            <div class="controls">
+                <button class="toggle-btn" id="themeToggle">🌙 Dark Mode</button>
+                <button class="toggle-btn" id="langToggle">🇩🇪 Deutsch</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1 data-en="Michael Novotny" data-de="Michael Novotny">Michael Novotny</h1>
+                <p class="subtitle" data-en="Aspiring Full-Stack Developer & Machine Learning Enthusiast" data-de="Angehender Full-Stack-Entwickler & Machine-Learning-Enthusiast">Aspiring Full-Stack Developer & Machine Learning Enthusiast</p>
+                <p class="bio" data-en="15-year-old developer passionate about building innovative solutions with Python, web technologies, and exploring the exciting world of machine learning and artificial intelligence." data-de="15-jähriger Entwickler mit Leidenschaft für innovative Lösungen mit Python, Webtechnologien und die spannende Welt des maschinellen Lernens und der künstlichen Intelligenz.">15-year-old developer passionate about building innovative solutions with Python, web technologies, and exploring the exciting world of machine learning and artificial intelligence.</p>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <h2 data-en="About Me" data-de="Über mich">About Me</h2>
+                <div class="about-content">
+                    <p data-en="I'm a dedicated student developer currently exploring the vast landscape of software development. My journey began with Python, and I've since expanded into full-stack web development and backend technologies. What truly excites me is machine learning – the potential to create intelligent systems that can learn and adapt fascinates me." data-de="Ich bin ein engagierter Schüler-Entwickler, der derzeit die vielfältige Landschaft der Softwareentwicklung erkundet. Meine Reise begann mit Python, und seitdem habe ich mich in die Full-Stack-Webentwicklung und Backend-Technologien vertieft. Was mich wirklich begeistert, ist maschinelles Lernen – das Potenzial, intelligente Systeme zu schaffen, die lernen und sich anpassen können, fasziniert mich.">I'm a dedicated student developer currently exploring the vast landscape of software development. My journey began with Python, and I've since expanded into full-stack web development and backend technologies. What truly excites me is machine learning – the potential to create intelligent systems that can learn and adapt fascinates me.</p>
+                    <br>
+                    <p data-en="I'm constantly learning, building projects, and pushing myself to understand complex concepts. Whether it's developing web applications, working with databases, or experimenting with ML algorithms, I approach each challenge as an opportunity to grow." data-de="Ich lerne ständig, baue Projekte und fordere mich selbst heraus, komplexe Konzepte zu verstehen. Ob es die Entwicklung von Webanwendungen, die Arbeit mit Datenbanken oder das Experimentieren mit ML-Algorithmen ist – ich betrachte jede Herausforderung als Gelegenheit zu wachsen.">I'm constantly learning, building projects, and pushing myself to understand complex concepts. Whether it's developing web applications, working with databases, or experimenting with ML algorithms, I approach each challenge as an opportunity to grow.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            <div class="container">
+                <h2 data-en="Skills & Technologies" data-de="Fähigkeiten & Technologien">Skills & Technologies</h2>
+                <div class="skills-grid">
+                    <div class="skill-card">
+                        <h3 data-en="Frontend Development" data-de="Frontend-Entwicklung">Frontend Development</h3>
+                        <ul>
+                            <li>HTML5 & CSS3</li>
+                            <li>JavaScript</li>
+                            <li data-en="Responsive Design" data-de="Responsives Design">Responsive Design</li>
+                            <li data-en="Modern UI/UX" data-de="Modernes UI/UX">Modern UI/UX</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card">
+                        <h3 data-en="Backend Development" data-de="Backend-Entwicklung">Backend Development</h3>
+                        <ul>
+                            <li>Python</li>
+                            <li>SQL & Databases</li>
+                            <li data-en="Server-side Logic" data-de="Serverseitige Logik">Server-side Logic</li>
+                            <li>API Development</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card">
+                        <h3 data-en="Machine Learning" data-de="Maschinelles Lernen">Machine Learning</h3>
+                        <ul>
+                            <li>Python ML Libraries</li>
+                            <li data-en="Data Analysis" data-de="Datenanalyse">Data Analysis</li>
+                            <li data-en="Model Training" data-de="Modelltraining">Model Training</li>
+                            <li data-en="AI Algorithms" data-de="KI-Algorithmen">AI Algorithms</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="container">
+                <h2 data-en="Get in Touch" data-de="Kontakt">Get in Touch</h2>
+                <div class="contact-grid">
+                    <a href="mailto:michael.novotny2010@gmail.com" class="contact-card">
+                        <div class="icon">📧</div>
+                        <h3>Email</h3>
+                        <p>michael.novotny2010@gmail.com</p>
+                    </a>
+                    <a href="https://github.com/Michael104104" target="_blank" class="contact-card">
+                        <div class="icon">💻</div>
+                        <h3>GitHub</h3>
+                        <p>Michael104104</p>
+                    </a>
+                    <a href="https://discord.com/users/michael_1040" target="_blank" class="contact-card">
+                        <div class="icon">💬</div>
+                        <h3>Discord</h3>
+                        <p>michael_1040</p>
+                    </a>
+                    <a href="https://instagram.com/michael_1040" target="_blank" class="contact-card">
+                        <div class="icon">📸</div>
+                        <h3>Instagram</h3>
+                        <p>@michael_1040</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p data-en="© 2025 Michael Novotny. Built with passion and code." data-de="© 2025 Michael Novotny. Mit Leidenschaft und Code erstellt.">© 2025 Michael Novotny. Built with passion and code.</p>
+        </div>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const langToggle = document.getElementById('langToggle');
+        const body = document.body;
+        let currentLang = 'en';
+
+        // Theme toggle
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            themeToggle.textContent = newTheme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode';
+        });
+
+        // Language toggle
+        langToggle.addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'de' : 'en';
+            updateLanguage();
+            langToggle.textContent = currentLang === 'en' ? '🇩🇪 Deutsch' : '🇬🇧 English';
+        });
+
+        function updateLanguage() {
+            const elements = document.querySelectorAll('[data-en]');
+            elements.forEach(el => {
+                if (el.getAttribute(`data-${currentLang}`)) {
+                    el.textContent = el.getAttribute(`data-${currentLang}`);
+                }
+            });
+        }
+    </script>
 </body>
 </html>
-
-
