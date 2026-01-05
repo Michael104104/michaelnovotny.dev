@@ -30,6 +30,8 @@
             --error-bg: #f8d7da;
             --error-text: #721c24;
             --error-border: #f5c6cb;
+            --success-bg: #d4edda;
+            --success-text: #155724;
         }
 
         [data-theme="dark"] {
@@ -51,6 +53,8 @@
             --error-bg: #5a1a1a;
             --error-text: #ffb3b3;
             --error-border: #8a2a2a;
+            --success-bg: #1a4d1a;
+            --success-text: #90ee90;
         }
 
         body {
@@ -206,11 +210,55 @@
             background-color: var(--bg-secondary);
         }
 
+        .system-prompt-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
         .system-prompt-label {
             font-size: 12px;
             font-weight: 500;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+        }
+
+        .system-prompt-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .system-prompt-save {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .system-prompt-save:hover {
+            background-color: var(--button-hover);
+        }
+
+        .system-prompt-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .system-prompt-status {
+            font-size: 11px;
+            color: var(--success-text);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .system-prompt-status.show {
+            opacity: 1;
         }
 
         .system-prompt-input {
@@ -229,6 +277,10 @@
         .system-prompt-input:focus {
             outline: none;
             border-color: var(--button-bg);
+        }
+
+        .system-prompt-input.unsaved {
+            border-color: #ffc107;
         }
 
         .chat-container {
@@ -545,7 +597,13 @@
     </div>
 
     <div class="system-prompt-container">
-        <div class="system-prompt-label">System Prompt</div>
+        <div class="system-prompt-header">
+            <div class="system-prompt-label">System Prompt</div>
+            <div class="system-prompt-controls">
+                <span class="system-prompt-status" id="systemPromptStatus">Saved</span>
+                <button class="system-prompt-save" id="systemPromptSave">Save</button>
+            </div>
+        </div>
         <textarea class="system-prompt-input" id="systemPrompt" placeholder="Enter system prompt (optional)"></textarea>
     </div>
 
@@ -571,6 +629,7 @@
         const state = {
             messages: [],
             systemPrompt: '',
+            savedSystemPrompt: '',
             theme: 'light',
             isStreaming: false,
             editingMessageId: null,
@@ -584,6 +643,8 @@
             inputTextarea: document.getElementById('inputTextarea'),
             sendButton: document.getElementById('sendButton'),
             systemPrompt: document.getElementById('systemPrompt'),
+            systemPromptSave: document.getElementById('systemPromptSave'),
+            systemPromptStatus: document.getElementById('systemPromptStatus'),
             themeToggle: document.getElementById('themeToggle'),
             clearButton: document.getElementById('clearButton'),
             passwordOverlay: document.getElementById('passwordOverlay'),
@@ -599,7 +660,7 @@
         function saveToStorage() {
             const data = {
                 messages: state.messages,
-                systemPrompt: state.systemPrompt,
+                savedSystemPrompt: state.savedSystemPrompt,
                 theme: state.theme,
                 timestamp: Date.now()
             };
@@ -621,11 +682,13 @@
                 }
 
                 state.messages = data.messages || [];
-                state.systemPrompt = data.systemPrompt || '';
+                state.savedSystemPrompt = data.savedSystemPrompt || '';
+                state.systemPrompt = state.savedSystemPrompt;
                 state.theme = data.theme || 'light';
                 
                 elements.systemPrompt.value = state.systemPrompt;
                 document.documentElement.setAttribute('data-theme', state.theme);
+                updateSystemPromptUI();
                 
                 return true;
             } catch (e) {
@@ -640,6 +703,36 @@
 
         function loadPassword() {
             return sessionStorage.getItem(PASSWORD_KEY);
+        }
+
+        function updateSystemPromptUI() {
+            const currentValue = elements.systemPrompt.value;
+            const hasUnsavedChanges = currentValue !== state.savedSystemPrompt;
+            
+            if (hasUnsavedChanges) {
+                elements.systemPrompt.classList.add('unsaved');
+                elements.systemPromptSave.disabled = false;
+                elements.systemPromptStatus.classList.remove('show');
+            } else {
+                elements.systemPrompt.classList.remove('unsaved');
+                elements.systemPromptSave.disabled = true;
+            }
+        }
+
+        function saveSystemPrompt() {
+            state.savedSystemPrompt = elements.systemPrompt.value;
+            state.systemPrompt = state.savedSystemPrompt;
+            elements.systemPrompt.classList.remove('unsaved');
+            elements.systemPromptSave.disabled = true;
+            
+            elements.systemPromptStatus.textContent = 'Saved';
+            elements.systemPromptStatus.classList.add('show');
+            
+            setTimeout(() => {
+                elements.systemPromptStatus.classList.remove('show');
+            }, 2000);
+            
+            saveToStorage();
         }
 
         async function verifyPassword(password) {
@@ -778,298 +871,300 @@
                     </div>
                 `;
                 wrapper.appendChild(editContainer);
-            const textarea = editContainer.querySelector('.edit-textarea');
-            const saveBtn = editContainer.querySelector('.edit-save');
-            const cancelBtn = editContainer.querySelector('.edit-cancel');
 
-            saveBtn.onclick = () => saveEdit(message.id);
-            cancelBtn.onclick = () => cancelEdit(message.id);
-        }
+                const textarea = editContainer.querySelector('.edit-textarea');
+                const saveBtn = editContainer.querySelector('.edit-save');
+                const cancelBtn = editContainer.querySelector('.edit-cancel');
 
-        return wrapper;
-    }
-
-    function startEditing(messageId) {
-        if (state.editingMessageId) {
-            cancelEdit(state.editingMessageId);
-        }
-
-        state.editingMessageId = messageId;
-        const message = state.messages.find(m => m.id === messageId);
-        const wrapper = elements.messages.querySelector(`[data-message-id="${messageId}"]`);
-        const editContainer = wrapper.querySelector('.edit-container');
-        const textarea = editContainer.querySelector('.edit-textarea');
-        const messageDiv = wrapper.querySelector('.message');
-
-        textarea.value = message.content;
-        messageDiv.style.display = 'none';
-        editContainer.classList.add('active');
-        textarea.focus();
-    }
-
-    function saveEdit(messageId) {
-        const message = state.messages.find(m => m.id === messageId);
-        const wrapper = elements.messages.querySelector(`[data-message-id="${messageId}"]`);
-        const editContainer = wrapper.querySelector('.edit-container');
-        const textarea = editContainer.querySelector('.edit-textarea');
-        const messageDiv = wrapper.querySelector('.message');
-        const editButton = messageDiv.querySelector('.edit-button');
-
-        const newContent = textarea.value.trim();
-        if (!newContent) {
-            cancelEdit(messageId);
-            return;
-        }
-
-        message.content = newContent;
-
-        if (message.role === 'user' || message.role === 'assistant') {
-            messageDiv.innerHTML = parseMarkdown(newContent);
-            messageDiv.appendChild(editButton);
-        }
-
-        messageDiv.style.display = '';
-        editContainer.classList.remove('active');
-        state.editingMessageId = null;
-
-        saveToStorage();
-    }
-
-    function cancelEdit(messageId) {
-        const wrapper = elements.messages.querySelector(`[data-message-id="${messageId}"]`);
-        const editContainer = wrapper.querySelector('.edit-container');
-        const messageDiv = wrapper.querySelector('.message');
-
-        messageDiv.style.display = '';
-        editContainer.classList.remove('active');
-        state.editingMessageId = null;
-    }
-
-    function renderMessages() {
-        elements.messages.innerHTML = '';
-        
-        if (state.messages.length === 0) {
-            elements.messages.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-title">Welcome to DeepSeek Chat</div>
-                    <div class="empty-state-subtitle">Start a conversation by typing a message below</div>
-                </div>
-            `;
-            return;
-        }
-
-        state.messages.forEach(message => {
-            elements.messages.appendChild(renderMessage(message));
-        });
-
-        scrollToBottom();
-    }
-
-    function scrollToBottom() {
-        elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
-    }
-
-    function addMessage(role, content, id = null) {
-        const message = {
-            id: id || generateId(),
-            role,
-            content
-        };
-        state.messages.push(message);
-        elements.messages.appendChild(renderMessage(message));
-        scrollToBottom();
-        saveToStorage();
-        return message;
-    }
-
-    function updateLastMessage(content) {
-        if (state.messages.length === 0) return;
-        
-        const lastMessage = state.messages[state.messages.length - 1];
-        lastMessage.content = content;
-        
-        const lastWrapper = elements.messages.lastElementChild;
-        const messageDiv = lastWrapper.querySelector('.message');
-        const editButton = messageDiv.querySelector('.edit-button');
-        
-        messageDiv.innerHTML = parseMarkdown(content);
-        if (editButton) {
-            messageDiv.appendChild(editButton);
-        }
-        
-        scrollToBottom();
-    }
-
-    function removeLastMessage() {
-        if (state.messages.length === 0) return;
-        state.messages.pop();
-        if (elements.messages.lastElementChild) {
-            elements.messages.removeChild(elements.messages.lastElementChild);
-        }
-    }
-
-    async function sendMessage(userMessage, retryCount = 0) {
-        if (state.isStreaming || !state.isAuthenticated) return;
-
-        state.isStreaming = true;
-        elements.sendButton.disabled = true;
-        elements.inputTextarea.disabled = true;
-
-        const messages = [];
-        
-        if (state.systemPrompt.trim()) {
-            messages.push({
-                role: 'system',
-                content: state.systemPrompt.trim()
-            });
-        }
-
-        state.messages
-            .filter(m => m.role === 'user' || m.role === 'assistant')
-            .forEach(m => {
-                messages.push({
-                    role: m.role,
-                    content: m.content
-                });
-            });
-
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Chat-Password': state.password
-                },
-                body: JSON.stringify({
-                    model: MODEL,
-                    messages: messages,
-                    stream: true
-                })
-            });
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    state.isAuthenticated = false;
-                    sessionStorage.removeItem(PASSWORD_KEY);
-                    elements.passwordOverlay.classList.remove('hidden');
-                    elements.passwordInput.focus();
-                    throw new Error('Authentication failed. Please enter password again.');
-                }
-                throw new Error(`HTTP error ${response.status}`);
+                saveBtn.onclick = () => saveEdit(message.id);
+                cancelBtn.onclick = () => cancelEdit(message.id);
             }
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-            let assistantMessage = addMessage('assistant', '');
+            return wrapper;
+        }
 
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
+        function startEditing(messageId) {
+            if (state.editingMessageId) {
+                cancelEdit(state.editingMessageId);
+            }
 
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop();
+            state.editingMessageId = messageId;
+            const message = state.messages.find(m => m.id === messageId);
+            const wrapper = elements.messages.querySelector(`[data-message-id="${messageId}"]`);
+            const editContainer = wrapper.querySelector('.edit-container');
+            const textarea = editContainer.querySelector('.edit-textarea');
+            const messageDiv = wrapper.querySelector('.message');
 
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const data = line.slice(6);
-                        if (data === '[DONE]') continue;
+            textarea.value = message.content;
+            messageDiv.style.display = 'none';
+            editContainer.classList.add('active');
+            textarea.focus();
+        }
 
-                        try {
-                            const parsed = JSON.parse(data);
-                            const content = parsed.choices?.[0]?.delta?.content;
-                            if (content) {
-                                assistantMessage.content += content;
-                                updateLastMessage(assistantMessage.content);
+        function saveEdit(messageId) {
+            const message = state.messages.find(m => m.id === messageId);
+            const wrapper = elements.messages.querySelector(`[data-message-id="${messageId}"]`);
+            const editContainer = wrapper.querySelector('.edit-container');
+            const textarea = editContainer.querySelector('.edit-textarea');
+            const messageDiv = wrapper.querySelector('.message');
+            const editButton = messageDiv.querySelector('.edit-button');
+
+            const newContent = textarea.value.trim();
+            if (!newContent) {
+                cancelEdit(messageId);
+                return;
+            }
+
+            message.content = newContent;
+
+            if (message.role === 'user' || message.role === 'assistant') {
+                messageDiv.innerHTML = parseMarkdown(newContent);
+                messageDiv.appendChild(editButton);
+            }
+
+            messageDiv.style.display = '';
+            editContainer.classList.remove('active');
+            state.editingMessageId = null;
+
+            saveToStorage();
+        }
+
+        function cancelEdit(messageId) {
+            const wrapper = elements.messages.querySelector(`[data-message-id="${messageId}"]`);
+            const editContainer = wrapper.querySelector('.edit-container');
+            const messageDiv = wrapper.querySelector('.message');
+
+            messageDiv.style.display = '';
+            editContainer.classList.remove('active');
+            state.editingMessageId = null;
+        }
+
+        function renderMessages() {
+            elements.messages.innerHTML = '';
+            
+            if (state.messages.length === 0) {
+                elements.messages.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-title">Welcome to DeepSeek Chat</div>
+                        <div class="empty-state-subtitle">Start a conversation by typing a message below</div>
+                    </div>
+                `;
+                return;
+            }
+
+            state.messages.forEach(message => {
+                elements.messages.appendChild(renderMessage(message));
+            });
+
+            scrollToBottom();
+        }
+        
+function scrollToBottom() {
+            elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+        }
+
+        function addMessage(role, content, id = null) {
+            const message = {
+                id: id || generateId(),
+                role,
+                content
+            };
+            state.messages.push(message);
+            elements.messages.appendChild(renderMessage(message));
+            scrollToBottom();
+            saveToStorage();
+            return message;
+        }
+
+        function updateLastMessage(content) {
+            if (state.messages.length === 0) return;
+            
+            const lastMessage = state.messages[state.messages.length - 1];
+            lastMessage.content = content;
+            
+            const lastWrapper = elements.messages.lastElementChild;
+            const messageDiv = lastWrapper.querySelector('.message');
+            const editButton = messageDiv.querySelector('.edit-button');
+            
+            messageDiv.innerHTML = parseMarkdown(content);
+            if (editButton) {
+                messageDiv.appendChild(editButton);
+            }
+            
+            scrollToBottom();
+        }
+
+        function removeLastMessage() {
+            if (state.messages.length === 0) return;
+            state.messages.pop();
+            if (elements.messages.lastElementChild) {
+                elements.messages.removeChild(elements.messages.lastElementChild);
+            }
+        }
+
+        async function sendMessage(userMessage, retryCount = 0) {
+            if (state.isStreaming || !state.isAuthenticated) return;
+
+            state.isStreaming = true;
+            elements.sendButton.disabled = true;
+            elements.inputTextarea.disabled = true;
+
+            const messages = [];
+            
+            if (state.savedSystemPrompt.trim()) {
+                messages.push({
+                    role: 'system',
+                    content: state.savedSystemPrompt.trim()
+                });
+            }
+
+            state.messages
+                .filter(m => m.role === 'user' || m.role === 'assistant')
+                .forEach(m => {
+                    messages.push({
+                        role: m.role,
+                        content: m.content
+                    });
+                });
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Chat-Password': state.password
+                    },
+                    body: JSON.stringify({
+                        model: MODEL,
+                        messages: messages,
+                        stream: true
+                    })
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        state.isAuthenticated = false;
+                        sessionStorage.removeItem(PASSWORD_KEY);
+                        elements.passwordOverlay.classList.remove('hidden');
+                        elements.passwordInput.focus();
+                        throw new Error('Authentication failed. Please enter password again.');
+                    }
+                    throw new Error(`HTTP error ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let assistantMessage = addMessage('assistant', '');
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') continue;
+
+                            try {
+                                const parsed = JSON.parse(data);
+                                const content = parsed.choices?.[0]?.delta?.content;
+                                if (content) {
+                                    assistantMessage.content += content;
+                                    updateLastMessage(assistantMessage.content);
+                                }
+                            } catch (e) {
+                                console.error('Failed to parse SSE data:', e);
                             }
-                        } catch (e) {
-                            console.error('Failed to parse SSE data:', e);
                         }
                     }
                 }
-            }
 
-            saveToStorage();
-        } catch (error) {
-            console.error('Error sending message:', error);
-            
-            if (retryCount === 0) {
-                removeLastMessage();
-                await sendMessage(userMessage, 1);
-            } else {
-                removeLastMessage();
-                addMessage('error', `Error: ${error.message}. Please try again.`);
-            }
-        } finally {
-            state.isStreaming = false;
-            elements.sendButton.disabled = false;
-            elements.inputTextarea.disabled = false;
-            elements.inputTextarea.focus();
-        }
-    }
-
-    function handleSend() {
-        const message = elements.inputTextarea.value.trim();
-        if (!message || state.isStreaming || !state.isAuthenticated) return;
-
-        addMessage('user', message);
-        elements.inputTextarea.value = '';
-        elements.inputTextarea.style.height = 'auto';
-        
-        sendMessage(message);
-    }
-
-    function handleClear() {
-        if (state.isStreaming) return;
-        
-        if (state.messages.length > 0) {
-            if (confirm('Are you sure you want to clear the chat?')) {
-                state.messages = [];
-                renderMessages();
                 saveToStorage();
+            } catch (error) {
+                console.error('Error sending message:', error);
+                
+                if (retryCount === 0) {
+                    removeLastMessage();
+                    await sendMessage(userMessage, 1);
+                } else {
+                    removeLastMessage();
+                    addMessage('error', `Error: ${error.message}. Please try again.`);
+                }
+            } finally {
+                state.isStreaming = false;
+                elements.sendButton.disabled = false;
+                elements.inputTextarea.disabled = false;
+                elements.inputTextarea.focus();
             }
         }
-    }
 
-    function toggleTheme() {
-        state.theme = state.theme === 'light' ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', state.theme);
-        saveToStorage();
-    }
+        function handleSend() {
+            const message = elements.inputTextarea.value.trim();
+            if (!message || state.isStreaming || !state.isAuthenticated) return;
 
-    elements.sendButton.addEventListener('click', handleSend);
-    elements.clearButton.addEventListener('click', handleClear);
-    elements.themeToggle.addEventListener('click', toggleTheme);
-    elements.passwordButton.addEventListener('click', handlePasswordSubmit);
-
-    elements.passwordInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            handlePasswordSubmit();
+            addMessage('user', message);
+            elements.inputTextarea.value = '';
+            elements.inputTextarea.style.height = 'auto';
+            
+            sendMessage(message);
         }
-    });
 
-    elements.inputTextarea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
+        function handleClear() {
+            if (state.isStreaming) return;
+            
+            if (state.messages.length > 0) {
+                if (confirm('Are you sure you want to clear the chat?')) {
+                    state.messages = [];
+                    renderMessages();
+                    saveToStorage();
+                }
+            }
         }
-    });
 
-    elements.inputTextarea.addEventListener('input', (e) => {
-        e.target.style.height = 'auto';
-        e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
-    });
+        function toggleTheme() {
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', state.theme);
+            saveToStorage();
+        }
 
-    elements.systemPrompt.addEventListener('input', (e) => {
-        state.systemPrompt = e.target.value;
-        saveToStorage();
-    });
+        elements.sendButton.addEventListener('click', handleSend);
+        elements.clearButton.addEventListener('click', handleClear);
+        elements.themeToggle.addEventListener('click', toggleTheme);
+        elements.passwordButton.addEventListener('click', handlePasswordSubmit);
+        elements.systemPromptSave.addEventListener('click', saveSystemPrompt);
 
-    loadFromStorage();
-    renderMessages();
-    checkAuthentication();
-</script>
+        elements.passwordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handlePasswordSubmit();
+            }
+        });
+
+        elements.inputTextarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        elements.inputTextarea.addEventListener('input', (e) => {
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+        });
+
+        elements.systemPrompt.addEventListener('input', (e) => {
+            state.systemPrompt = e.target.value;
+            updateSystemPromptUI();
+        });
+
+        loadFromStorage();
+        renderMessages();
+        checkAuthentication();
+    </script>
 </body>
 </html>
