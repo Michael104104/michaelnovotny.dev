@@ -1629,41 +1629,44 @@
 
         // Message rendering
         function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         function parseMarkdown(text) {
             let html = text;
             
-            // Store code blocks and inline code with placeholders
+            // Storage arrays for protected content
             const codeBlocks = [];
             const inlineCodes = [];
+            const escapedChars = [];
             
-            // Step 1: Extract and protect fenced code blocks (```lang\ncode\n```)
-            html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-                const placeholder = `___CODEBLOCK${codeBlocks.length}___`;
-                codeBlocks.push(`<pre><code class="language-${lang || 'plaintext'}">${escapeHtml(code)}</code></pre>`);
-                return placeholder;
+            // Step 1: Extract and protect fenced code blocks
+            html = html.replace(/```(\w+)?\n?([\s\S]*?)```/g, (match, lang, code) => {
+                const id = codeBlocks.length;
+                codeBlocks.push(`<pre><code class="language-${lang || 'plaintext'}">${escapeHtml(code.trim())}</code></pre>`);
+                return `___CODEBLOCK_${id}___`;
             });
             
-            // Step 2: Extract and protect inline code (`code`)
+            // Step 2: Extract and protect inline code
             html = html.replace(/`([^`\n]+)`/g, (match, code) => {
-                const placeholder = `___INLINECODE${inlineCodes.length}___`;
+                const id = inlineCodes.length;
                 inlineCodes.push(`<code>${escapeHtml(code)}</code>`);
-                return placeholder;
+                return `___INLINECODE_${id}___`;
             });
             
             // Step 3: Handle escaped characters (before other processing)
-            const escapedChars = [];
             html = html.replace(/\\([\\`*_{}[\]()#+\-.!|])/g, (match, char) => {
-                const placeholder = `___ESCAPED${escapedChars.length}___`;
+                const id = escapedChars.length;
                 escapedChars.push(escapeHtml(char));
-                return placeholder;
+                return `___ESCAPED_${id}___`;
             });
             
-            // Step 4: Process headers (must be at line start)
+            // Step 4: Process headers
             html = html.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>');
             html = html.replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>');
             html = html.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>');
@@ -1674,7 +1677,7 @@
             // Step 5: Horizontal rules
             html = html.replace(/^[\-\*_]{3,}$/gm, '<hr>');
             
-            // Step 6: Tables (complex processing)
+            // Step 6: Tables
             html = html.replace(/^\|(.+)\|\s*\n\|[\s\-:|]+\|\s*\n((?:\|.+\|\s*\n?)+)/gm, (match, headerRow, bodyRows) => {
                 const headers = headerRow.split('|').map(h => h.trim()).filter(h => h);
                 const alignmentRow = match.split('\n')[1];
@@ -1709,7 +1712,7 @@
                 return table;
             });
             
-            // Step 7: Blockquotes (at line start)
+            // Step 7: Blockquotes
             html = html.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
             html = html.replace(/<\/blockquote>\n<blockquote>/g, '\n');
             
@@ -1726,7 +1729,7 @@
             html = html.replace(/^\d+\.\s+(.+)$/gm, '<ol><li>$1</li></ol>');
             html = html.replace(/<\/ol>\n<ol>/g, '\n');
             
-            // Step 11: Footnotes (simple implementation)
+            // Step 11: Footnotes
             const footnotes = {};
             html = html.replace(/^\[\^(\w+)\]:\s+(.+)$/gm, (match, id, text) => {
                 footnotes[id] = text;
@@ -1750,22 +1753,22 @@
             // Step 13: Strikethrough
             html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
             
-            // Step 14: Links [text](url) and [text](url "title")
+            // Step 14: Links
             html = html.replace(/\[([^\]]+)\]\(([^\s)]+)(?:\s+"([^"]+)")?\)/g, (match, text, url, title) => {
                 const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
                 return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
             });
             
-            // Step 15: Images ![alt](url) and ![alt](url "title")
+            // Step 15: Images
             html = html.replace(/!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]+)")?\)/g, (match, alt, url, title) => {
                 const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
                 return `<img src="${escapeHtml(url)}" alt="${escapeHtml(alt)}"${titleAttr}>`;
             });
             
-            // Step 16: Line breaks (two spaces + newline or double newline)
+            // Step 16: Line breaks
             html = html.replace(/  \n/g, '<br>\n');
             
-            // Step 17: Paragraphs (wrap text not in block elements)
+            // Step 17: Paragraphs
             const lines = html.split('\n');
             const processed = [];
             let currentParagraph = '';
@@ -1776,27 +1779,23 @@
                 // Check if line is a block element
                 if (line.match(/^<(h[1-6]|pre|ul|ol|blockquote|table|hr|div)/i) || 
                     line.match(/<\/(h[1-6]|pre|ul|ol|blockquote|table|hr|div)>$/i)) {
-                    // Finish current paragraph if exists
                     if (currentParagraph) {
                         processed.push(`<p>${currentParagraph}</p>`);
                         currentParagraph = '';
                     }
                     processed.push(line);
                 } else if (line === '') {
-                    // Empty line ends paragraph
                     if (currentParagraph) {
                         processed.push(`<p>${currentParagraph}</p>`);
                         currentParagraph = '';
                     }
-                } else if (line.startsWith('___CODEBLOCK') || line.startsWith('___INLINECODE') || line.startsWith('___ESCAPED')) {
-                    // Placeholders - add to current paragraph or as standalone
+                } else if (line.startsWith('___CODEBLOCK_') || line.startsWith('___INLINECODE_') || line.startsWith('___ESCAPED_')) {
                     if (currentParagraph) {
                         currentParagraph += ' ' + line;
                     } else {
                         processed.push(line);
                     }
                 } else {
-                    // Regular text - add to current paragraph
                     if (currentParagraph) {
                         currentParagraph += ' ' + line;
                     } else {
@@ -1805,29 +1804,28 @@
                 }
             }
             
-            // Don't forget last paragraph
             if (currentParagraph) {
                 processed.push(`<p>${currentParagraph}</p>`);
             }
             
             html = processed.join('\n');
             
-            // Step 18: Restore escaped characters
+            // Step 18: Restore escaped characters FIRST
             escapedChars.forEach((char, i) => {
-                html = html.replace(`___ESCAPED${i}___`, char);
+                html = html.replace(new RegExp(`___ESCAPED_${i}___`, 'g'), char);
             });
             
-            // Step 19: Restore inline code
+            // Step 19: Restore inline code SECOND
             inlineCodes.forEach((code, i) => {
-                html = html.replace(`___INLINECODE${i}___`, code);
+                html = html.replace(new RegExp(`___INLINECODE_${i}___`, 'g'), code);
             });
             
-            // Step 20: Restore code blocks
+            // Step 20: Restore code blocks LAST
             codeBlocks.forEach((code, i) => {
-                html = html.replace(`___CODEBLOCK${i}___`, code);
+                html = html.replace(new RegExp(`___CODEBLOCK_${i}___`, 'g'), code);
             });
             
-            // Step 21: Add footnote definitions at the end
+            // Step 21: Add footnote definitions
             if (Object.keys(footnotes).length > 0) {
                 html += '<hr><div class="footnotes"><ol>';
                 Object.entries(footnotes).forEach(([id, text]) => {
