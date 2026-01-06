@@ -1628,56 +1628,79 @@
         }
 
         // Message rendering
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function parseMarkdown(text) {
             let html = text;
-
-            // Escape HTML first to prevent XSS
-            const tempDiv = document.createElement('div');
             
-            // Step 1: Protect code blocks (fenced with ```)
+            // Store code blocks and inline code with placeholders
             const codeBlocks = [];
+            const inlineCodes = [];
+            
+            // Step 1: Extract and protect fenced code blocks (```lang\ncode\n```)
             html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-                const placeholder = `___CODE_BLOCK_${codeBlocks.length}___`;
+                const placeholder = `___CODEBLOCK${codeBlocks.length}___`;
                 codeBlocks.push(`<pre><code class="language-${lang || 'plaintext'}">${escapeHtml(code)}</code></pre>`);
                 return placeholder;
             });
-
-            // Step 2: Protect inline code
-            const inlineCodes = [];
+            
+            // Step 2: Extract and protect inline code (`code`)
             html = html.replace(/`([^`\n]+)`/g, (match, code) => {
-                const placeholder = `___INLINE_CODE_${inlineCodes.length}___`;
+                const placeholder = `___INLINECODE${inlineCodes.length}___`;
                 inlineCodes.push(`<code>${escapeHtml(code)}</code>`);
                 return placeholder;
             });
-
-            // Step 3: Headers (must be at start of line)
+            
+            // Step 3: Handle escaped characters (before other processing)
+            const escapedChars = [];
+            html = html.replace(/\\([\\`*_{}[\]()#+\-.!|])/g, (match, char) => {
+                const placeholder = `___ESCAPED${escapedChars.length}___`;
+                escapedChars.push(escapeHtml(char));
+                return placeholder;
+            });
+            
+            // Step 4: Process headers (must be at line start)
             html = html.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>');
             html = html.replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>');
             html = html.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>');
             html = html.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>');
             html = html.replace(/^##\s+(.+)$/gm, '<h2>$1</h2>');
             html = html.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>');
-
-            // Step 4: Horizontal rules
+            
+            // Step 5: Horizontal rules
             html = html.replace(/^[\-\*_]{3,}$/gm, '<hr>');
-
-            // Step 5: Tables (before other processing)
-            html = html.replace(/^\|(.+)\|\s*\n\|[\s\-:|]+\|\s*\n((?:\|.+\|\s*\n?)+)/gm, (match, header, rows) => {
-                const headers = header.split('|').map(h => h.trim()).filter(h => h);
-                const rowsArray = rows.trim().split('\n').map(row => 
+            
+            // Step 6: Tables (complex processing)
+            html = html.replace(/^\|(.+)\|\s*\n\|[\s\-:|]+\|\s*\n((?:\|.+\|\s*\n?)+)/gm, (match, headerRow, bodyRows) => {
+                const headers = headerRow.split('|').map(h => h.trim()).filter(h => h);
+                const alignmentRow = match.split('\n')[1];
+                const alignments = alignmentRow.split('|').map(a => {
+                    a = a.trim();
+                    if (a.startsWith(':') && a.endsWith(':')) return 'center';
+                    if (a.endsWith(':')) return 'right';
+                    return 'left';
+                }).filter((_, i) => i > 0 && i <= headers.length);
+                
+                const rows = bodyRows.trim().split('\n').map(row => 
                     row.split('|').map(cell => cell.trim()).filter(cell => cell)
                 );
                 
-                let table = '<table style="border-collapse: collapse; width: 100%; margin: 12px 0;"><thead><tr>';
-                headers.forEach(h => {
-                    table += `<th style="border: 1px solid var(--border); padding: 8px; background-color: var(--bg-tertiary);">${h}</th>`;
+                let table = '<table><thead><tr>';
+                headers.forEach((h, i) => {
+                    const align = alignments[i] || 'left';
+                    table += `<th style="text-align: ${align};">${h}</th>`;
                 });
                 table += '</tr></thead><tbody>';
                 
-                rowsArray.forEach(row => {
+                rows.forEach(row => {
                     table += '<tr>';
-                    row.forEach(cell => {
-                        table += `<td style="border: 1px solid var(--border); padding: 8px;">${cell}</td>`;
+                    row.forEach((cell, i) => {
+                        const align = alignments[i] || 'left';
+                        table += `<td style="text-align: ${align};">${cell}</td>`;
                     });
                     table += '</tr>';
                 });
@@ -1685,100 +1708,135 @@
                 table += '</tbody></table>';
                 return table;
             });
-
-            // Step 6: Blockquotes (must be at start of line)
+            
+            // Step 7: Blockquotes (at line start)
             html = html.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
             html = html.replace(/<\/blockquote>\n<blockquote>/g, '\n');
-
-            // Step 7: Task lists
+            
+            // Step 8: Task lists
             html = html.replace(/^[\*\-]\s+\[\s\]\s+(.+)$/gm, '<ul><li style="list-style: none;"><input type="checkbox" disabled style="margin-right: 8px;">$1</li></ul>');
             html = html.replace(/^[\*\-]\s+\[x\]\s+(.+)$/gmi, '<ul><li style="list-style: none;"><input type="checkbox" checked disabled style="margin-right: 8px;">$1</li></ul>');
-
-            // Step 8: Unordered lists (*, -, or + at start of line)
+            html = html.replace(/<\/ul>\n<ul>/g, '\n');
+            
+            // Step 9: Unordered lists
             html = html.replace(/^[\*\-\+]\s+(.+)$/gm, '<ul><li>$1</li></ul>');
             html = html.replace(/<\/ul>\n<ul>/g, '\n');
-
-            // Step 9: Ordered lists
+            
+            // Step 10: Ordered lists
             html = html.replace(/^\d+\.\s+(.+)$/gm, '<ol><li>$1</li></ol>');
             html = html.replace(/<\/ol>\n<ol>/g, '\n');
-
-            // Step 10: Bold and italic (*** for bold+italic, ** for bold, * for italic)
+            
+            // Step 11: Footnotes (simple implementation)
+            const footnotes = {};
+            html = html.replace(/^\[\^(\w+)\]:\s+(.+)$/gm, (match, id, text) => {
+                footnotes[id] = text;
+                return '';
+            });
+            html = html.replace(/\[\^(\w+)\]/g, (match, id) => {
+                if (footnotes[id]) {
+                    return `<sup><a href="#fn-${id}" id="fnref-${id}">[${id}]</a></sup>`;
+                }
+                return match;
+            });
+            
+            // Step 12: Bold and italic (order matters!)
             html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-            html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
             html = html.replace(/___(.+?)___/g, '<strong><em>$1</em></strong>');
+            html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
             html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
             html = html.replace(/_(.+?)_/g, '<em>$1</em>');
-
-            // Step 11: Strikethrough
+            
+            // Step 13: Strikethrough
             html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
-
-            // Step 12: Links [text](url)
-            html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: var(--button-bg); text-decoration: underline;">$1</a>');
-
-            // Step 13: Images ![alt](url)
-            html = html.replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; border-radius: 6px; margin: 8px 0;">');
-
-            // Step 14: Line breaks (two spaces at end of line OR actual line breaks)
+            
+            // Step 14: Links [text](url) and [text](url "title")
+            html = html.replace(/\[([^\]]+)\]\(([^\s)]+)(?:\s+"([^"]+)")?\)/g, (match, text, url, title) => {
+                const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+                return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
+            });
+            
+            // Step 15: Images ![alt](url) and ![alt](url "title")
+            html = html.replace(/!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]+)")?\)/g, (match, alt, url, title) => {
+                const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+                return `<img src="${escapeHtml(url)}" alt="${escapeHtml(alt)}"${titleAttr}>`;
+            });
+            
+            // Step 16: Line breaks (two spaces + newline or double newline)
             html = html.replace(/  \n/g, '<br>\n');
-
-            // Step 15: Paragraphs (split by double newlines)
+            
+            // Step 17: Paragraphs (wrap text not in block elements)
             const lines = html.split('\n');
             const processed = [];
-            let inParagraph = false;
-            let paragraphContent = '';
-
+            let currentParagraph = '';
+            
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 
-                // Skip if it's already a block element
-                if (line.match(/^<(h[1-6]|pre|ul|ol|blockquote|table|hr)/)) {
-                    if (inParagraph && paragraphContent) {
-                        processed.push(`<p>${paragraphContent.trim()}</p>`);
-                        paragraphContent = '';
-                        inParagraph = false;
+                // Check if line is a block element
+                if (line.match(/^<(h[1-6]|pre|ul|ol|blockquote|table|hr|div)/i) || 
+                    line.match(/<\/(h[1-6]|pre|ul|ol|blockquote|table|hr|div)>$/i)) {
+                    // Finish current paragraph if exists
+                    if (currentParagraph) {
+                        processed.push(`<p>${currentParagraph}</p>`);
+                        currentParagraph = '';
                     }
                     processed.push(line);
                 } else if (line === '') {
-                    if (inParagraph && paragraphContent) {
-                        processed.push(`<p>${paragraphContent.trim()}</p>`);
-                        paragraphContent = '';
-                        inParagraph = false;
+                    // Empty line ends paragraph
+                    if (currentParagraph) {
+                        processed.push(`<p>${currentParagraph}</p>`);
+                        currentParagraph = '';
+                    }
+                } else if (line.startsWith('___CODEBLOCK') || line.startsWith('___INLINECODE') || line.startsWith('___ESCAPED')) {
+                    // Placeholders - add to current paragraph or as standalone
+                    if (currentParagraph) {
+                        currentParagraph += ' ' + line;
+                    } else {
+                        processed.push(line);
                     }
                 } else {
-                    if (!inParagraph) {
-                        inParagraph = true;
-                        paragraphContent = line;
+                    // Regular text - add to current paragraph
+                    if (currentParagraph) {
+                        currentParagraph += ' ' + line;
                     } else {
-                        paragraphContent += ' ' + line;
+                        currentParagraph = line;
                     }
                 }
             }
-
-            // Handle remaining paragraph content
-            if (inParagraph && paragraphContent) {
-                processed.push(`<p>${paragraphContent.trim()}</p>`);
+            
+            // Don't forget last paragraph
+            if (currentParagraph) {
+                processed.push(`<p>${currentParagraph}</p>`);
             }
-
+            
             html = processed.join('\n');
-
-            // Step 16: Restore inline code
+            
+            // Step 18: Restore escaped characters
+            escapedChars.forEach((char, i) => {
+                html = html.replace(`___ESCAPED${i}___`, char);
+            });
+            
+            // Step 19: Restore inline code
             inlineCodes.forEach((code, i) => {
-                html = html.replace(`___INLINE_CODE_${i}___`, code);
+                html = html.replace(`___INLINECODE${i}___`, code);
             });
-
-            // Step 17: Restore code blocks
+            
+            // Step 20: Restore code blocks
             codeBlocks.forEach((code, i) => {
-                html = html.replace(`___CODE_BLOCK_${i}___`, code);
+                html = html.replace(`___CODEBLOCK${i}___`, code);
             });
-
+            
+            // Step 21: Add footnote definitions at the end
+            if (Object.keys(footnotes).length > 0) {
+                html += '<hr><div class="footnotes"><ol>';
+                Object.entries(footnotes).forEach(([id, text]) => {
+                    html += `<li id="fn-${id}">${text} <a href="#fnref-${id}">↩</a></li>`;
+                });
+                html += '</ol></div>';
+            }
+            
             return html;
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
         }
 
         function renderMessage(message) {
