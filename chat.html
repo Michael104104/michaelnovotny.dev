@@ -1727,7 +1727,10 @@
             
             // Step 10: Ordered lists
             html = html.replace(/^\d+\.\s+(.+)$/gm, '<ol><li>$1</li></ol>');
-            html = html.replace(/<\/ol>\n<ol>/g, '\n');
+            // Merge consecutive <ol> tags
+            while (html.includes('</ol>\n<ol>')) {
+                html = html.replace('</ol>\n<ol>', '\n');
+            }
             
             // Step 11: Footnotes
             const footnotes = {};
@@ -1812,17 +1815,20 @@
             
             // Step 18: Restore escaped characters FIRST
             escapedChars.forEach((char, i) => {
-                html = html.replace(new RegExp(`___ESCAPED_${i}___`, 'g'), char);
+                const placeholder = `___ESCAPED_${i}___`;
+                html = html.split(placeholder).join(char);
             });
             
             // Step 19: Restore inline code SECOND
             inlineCodes.forEach((code, i) => {
-                html = html.replace(new RegExp(`___INLINECODE_${i}___`, 'g'), code);
+                const placeholder = `___INLINECODE_${i}___`;
+                html = html.split(placeholder).join(code);
             });
             
             // Step 20: Restore code blocks LAST
             codeBlocks.forEach((code, i) => {
-                html = html.replace(new RegExp(`___CODEBLOCK_${i}___`, 'g'), code);
+                const placeholder = `___CODEBLOCK_${i}___`;
+                html = html.split(placeholder).join(code);
             });
             
             // Step 21: Add footnote definitions
