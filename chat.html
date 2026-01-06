@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepSeek Chat</title>
+    <title>LLM Chat</title>
     <style>
         * {
             margin: 0;
@@ -30,8 +30,9 @@
             --error-bg: #f8d7da;
             --error-text: #721c24;
             --error-border: #f5c6cb;
-            --success-bg: #d4edda;
-            --success-text: #155724;
+            --sidebar-bg: #f8f9fa;
+            --active-chat: #e7f3ff;
+            --pinned-bg: #fff8dc;
         }
 
         [data-theme="dark"] {
@@ -53,8 +54,9 @@
             --error-bg: #5a1a1a;
             --error-text: #ffb3b3;
             --error-border: #8a2a2a;
-            --success-bg: #1a4d1a;
-            --success-text: #90ee90;
+            --sidebar-bg: #2d2d2d;
+            --active-chat: #1a3a5a;
+            --pinned-bg: #3a3a1a;
         }
 
         body {
@@ -65,8 +67,16 @@
             display: flex;
             flex-direction: column;
             transition: background-color 0.2s, color 0.2s;
+            overflow: hidden;
         }
 
+        .app-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Password Overlay */
         .password-overlay {
             position: fixed;
             top: 0;
@@ -77,7 +87,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
+            z-index: 10000;
         }
 
         .password-overlay.hidden {
@@ -153,6 +163,166 @@
             text-align: center;
         }
 
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+
+        .sidebar.closed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .new-chat-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .new-chat-btn:hover {
+            background-color: var(--button-hover);
+        }
+
+        .sidebar-search {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--button-bg);
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .chat-group {
+            margin-bottom: 16px;
+        }
+
+        .chat-group-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+        }
+
+        .chat-item {
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        .chat-item:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .chat-item.active {
+            background-color: var(--active-chat);
+        }
+
+        .chat-item.pinned {
+            background-color: var(--pinned-bg);
+        }
+
+        .chat-item.pinned::before {
+            content: "📌";
+            font-size: 12px;
+        }
+
+        .chat-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-item-name {
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-item-actions {
+            display: none;
+            gap: 4px;
+        }
+
+        .chat-item:hover .chat-item-actions {
+            display: flex;
+        }
+
+        .chat-action-btn {
+            background: none;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .chat-action-btn:hover {
+            opacity: 1;
+        }
+
+        .sidebar-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
         .header {
             padding: 16px 24px;
             border-bottom: 1px solid var(--border);
@@ -167,6 +337,15 @@
             align-items: center;
             gap: 16px;
             flex: 1;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-primary);
+            padding: 4px;
         }
 
         .header-title {
@@ -189,76 +368,53 @@
             background-color: var(--hover-bg);
         }
 
-        .clear-button {
-            background: none;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 8px 12px;
-            cursor: pointer;
-            color: var(--text-primary);
-            font-size: 14px;
-            transition: background-color 0.2s;
-        }
-
-        .clear-button:hover {
-            background-color: var(--hover-bg);
-        }
-
         .system-prompt-container {
             padding: 16px 24px;
             border-bottom: 1px solid var(--border);
             background-color: var(--bg-secondary);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
         }
 
-        .system-prompt-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .model-selector-wrapper {
+            min-width: 200px;
+            max-width: 250px;
+        }
+
+        .model-selector-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
             margin-bottom: 8px;
+        }
+
+        .model-selector {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .model-selector:focus {
+            outline: none;
+            border-color: var(--button-bg);
+        }
+
+        .system-prompt-wrapper {
+            flex: 1;
         }
 
         .system-prompt-label {
             font-size: 12px;
             font-weight: 500;
             color: var(--text-secondary);
-        }
-
-        .system-prompt-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .system-prompt-save {
-            background-color: var(--button-bg);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 4px 10px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: background-color 0.2s;
-        }
-
-        .system-prompt-save:hover {
-            background-color: var(--button-hover);
-        }
-
-        .system-prompt-save:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .system-prompt-status {
-            font-size: 11px;
-            color: var(--success-text);
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .system-prompt-status.show {
-            opacity: 1;
+            margin-bottom: 8px;
         }
 
         .system-prompt-input {
@@ -277,10 +433,6 @@
         .system-prompt-input:focus {
             outline: none;
             border-color: var(--button-bg);
-        }
-
-        .system-prompt-input.unsaved {
-            border-color: #ffc107;
         }
 
         .chat-container {
@@ -491,6 +643,98 @@
             cursor: not-allowed;
         }
 
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--bg-primary);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            margin-bottom: 16px;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--button-bg);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .modal-btn-primary {
+            background-color: var(--button-bg);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background-color: var(--button-hover);
+        }
+
+        .modal-btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .modal-btn-secondary:hover {
+            background-color: var(--border);
+        }
+
+        .modal-btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .modal-btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        /* Message styling */
         .message p {
             margin-bottom: 12px;
         }
@@ -575,6 +819,27 @@
         .empty-state-subtitle {
             font-size: 14px;
         }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 50%;
+                max-width: 280px;
+                z-index: 200;
+            }
+
+            .system-prompt-container {
+                flex-direction: column;
+            }
+
+            .model-selector-wrapper {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -588,151 +853,330 @@
         </div>
     </div>
 
-    <div class="header">
-        <div class="header-left">
-            <div class="header-title">DeepSeek Chat</div>
-            <button class="clear-button" id="clearButton">Clear Chat</button>
-        </div>
-        <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" id="newChatBtn">+ New Chat</button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search chats...">
+            </div>
+            <div class="chat-list" id="chatList"></div>
+            <div class="sidebar-footer" id="storageInfo">Storage: Calculating...</div>
+        </aside>
+
+        <main class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">☰</button>
+                    <div class="header-title" id="headerTitle">LLM Chat - Select a model</div>
+                </div>
+                <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+            </div>
+
+            <div class="system-prompt-container">
+                <div class="model-selector-wrapper">
+                    <div class="model-selector-label">Model</div>
+                    <select class="model-selector" id="modelSelector">
+                        <option value="">Select a model...</option>
+                    </select>
+                </div>
+                <div class="system-prompt-wrapper">
+                    <div class="system-prompt-label">System Prompt</div>
+                    <textarea class="system-prompt-input" id="systemPrompt" placeholder="Enter system prompt (optional)"></textarea>
+                </div>
+            </div>
+
+            <div class="chat-container" id="chatContainer">
+                <div class="messages" id="messages"></div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea class="input-textarea" id="inputTextarea" placeholder="Type your message..." rows="1"></textarea>
+                    <button class="send-button" id="sendButton">Send</button>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <div class="system-prompt-container">
-        <div class="system-prompt-header">
-            <div class="system-prompt-label">System Prompt</div>
-            <div class="system-prompt-controls">
-                <span class="system-prompt-status" id="systemPromptStatus">Saved</span>
-                <button class="system-prompt-save" id="systemPromptSave">Save</button>
+    <!-- Rename Modal -->
+    <div class="modal" id="renameModal">
+        <div class="modal-content">
+            <div class="modal-title">Rename Chat</div>
+            <input type="text" class="modal-input" id="renameInput" placeholder="Enter new name...">
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" id="renameCancelBtn">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="renameSaveBtn">Save</button>
             </div>
         </div>
-        <textarea class="system-prompt-input" id="systemPrompt" placeholder="Enter system prompt (optional)"></textarea>
     </div>
 
-    <div class="chat-container" id="chatContainer">
-        <div class="messages" id="messages"></div>
-    </div>
-
-    <div class="input-container">
-        <div class="input-wrapper">
-            <textarea class="input-textarea" id="inputTextarea" placeholder="Type your message..." rows="1"></textarea>
-            <button class="send-button" id="sendButton">Send</button>
+    <!-- Delete Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-title">Delete Chat</div>
+            <p style="margin-bottom: 16px; color: var(--text-secondary);">Are you sure you want to delete this chat? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" id="deleteCancelBtn">Cancel</button>
+                <button class="modal-btn modal-btn-danger" id="deleteConfirmBtn">Delete</button>
+            </div>
         </div>
     </div>
 
     <script>
         const API_URL = '/api/chat';
         const VERIFY_URL = '/api/verify-password';
-        const MODEL = 'nex-agi/deepseek-v3.1-nex-n1:free';
-        const STORAGE_KEY = 'deepseek_chat_data';
-        const PASSWORD_KEY = 'deepseek_chat_password';
-        const EXPIRY_DAYS = 7;
+        const CHATS_KEY = 'llm_chats';
+        const CURRENT_CHAT_KEY = 'llm_current_chat';
+        const PASSWORD_KEY = 'llm_chat_password';
+        const SETTINGS_KEY = 'llm_settings';
+        const MAX_CHATS = 50;
+
+        // Model list with providers
+        const MODELS = {
+            'Arcee AI': ['arcee-ai/trinity-mini:free'],
+            'Cognitive Computations': ['cognitivecomputations/dolphin-mistral-24b-venice-edition:free'],
+            'DeepSeek': ['deepseek/deepseek-r1-0528:free'],
+            'Google': [
+                'google/gemini-2.0-flash-exp:free',
+                'google/gemma-3-4b-it:free',
+                'google/gemma-3-12b-it:free',
+                'google/gemma-3-27b-it:free',
+                'google/gemma-3n-e2b-it:free',
+                'google/gemma-3n-e4b-it:free'
+            ],
+            'Meta': [
+                'meta-llama/llama-3.1-405b-instruct:free',
+                'meta-llama/llama-3.2-3b-instruct:free',
+                'meta-llama/llama-3.3-70b-instruct:free'
+            ],
+            'Mistral AI': [
+                'mistralai/devstral-2512:free',
+                'mistralai/mistral-7b-instruct:free',
+                'mistralai/mistral-small-3.1-24b-instruct:free'
+            ],
+            'Moonshot AI': ['moonshotai/kimi-k2:free'],
+            'Nex AGI': ['nex-agi/deepseek-v3.1-nex-n1:free'],
+            'Nous Research': ['nousresearch/hermes-3-llama-3.1-405b:free'],
+            'NVIDIA': [
+                'nvidia/nemotron-3-nano-30b-a3b:free',
+                'nvidia/nemotron-nano-9b-v2:free',
+                'nvidia/nemotron-nano-12b-v2-vl:free'
+            ],
+            'OpenAI': [
+                'openai/gpt-oss-20b:free',
+                'openai/gpt-oss-120b:free'
+            ],
+            'Qwen': [
+                'qwen/qwen-2.5-vl-7b-instruct:free',
+                'qwen/qwen3-4b:free',
+                'qwen/qwen3-coder:free'
+            ],
+            'TNG Tech': [
+                'tngtech/deepseek-r1t-chimera:free',
+                'tngtech/deepseek-r1t2-chimera:free',
+                'tngtech/tng-r1t-chimera:free'
+            ],
+            'Xiaomi': ['xiaomi/mimo-v2-flash:free'],
+            'Z AI': ['z-ai/glm-4.5-air:free']
+        };
+
+        // Friendly model names
+        const MODEL_NAMES = {
+            'arcee-ai/trinity-mini:free': 'Trinity Mini',
+            'cognitivecomputations/dolphin-mistral-24b-venice-edition:free': 'Dolphin Mistral 24B',
+            'deepseek/deepseek-r1-0528:free': 'DeepSeek R1',
+            'google/gemini-2.0-flash-exp:free': 'Gemini 2.0 Flash',
+            'google/gemma-3-4b-it:free': 'Gemma 3 4B',
+            'google/gemma-3-12b-it:free': 'Gemma 3 12B',
+            'google/gemma-3-27b-it:free': 'Gemma 3 27B',
+            'google/gemma-3n-e2b-it:free': 'Gemma 3N E2B',
+            'google/gemma-3n-e4b-it:free': 'Gemma 3N E4B',
+            'meta-llama/llama-3.1-405b-instruct:free': 'Llama 3.1 405B',
+            'meta-llama/llama-3.2-3b-instruct:free': 'Llama 3.2 3B',
+            'meta-llama/llama-3.3-70b-instruct:free': 'Llama 3.3 70B',
+            'mistralai/devstral-2512:free': 'Devstral',
+            'mistralai/mistral-7b-instruct:free': 'Mistral 7B',
+            'mistralai/mistral-small-3.1-24b-instruct:free': 'Mistral Small 3.1',
+            'moonshotai/kimi-k2:free': 'Kimi K2',
+            'nex-agi/deepseek-v3.1-nex-n1:free': 'DeepSeek V3.1',
+            'nousresearch/hermes-3-llama-3.1-405b:free': 'Hermes 3 405B',
+            'nvidia/nemotron-3-nano-30b-a3b:free': 'Nemotron 3 Nano 30B',
+            'nvidia/nemotron-nano-9b-v2:free': 'Nemotron Nano 9B',
+            'nvidia/nemotron-nano-12b-v2-vl:free': 'Nemotron Nano 12B VL',
+            'openai/gpt-oss-20b:free': 'GPT OSS 20B',
+            'openai/gpt-oss-120b:free': 'GPT OSS 120B',
+            'qwen/qwen-2.5-vl-7b-instruct:free': 'Qwen 2.5 VL 7B',
+            'qwen/qwen3-4b:free': 'Qwen3 4B',
+            'qwen/qwen3-coder:free': 'Qwen3 Coder',
+            'tngtech/deepseek-r1t-chimera:free': 'DeepSeek R1T Chimera',
+            'tngtech/deepseek-r1t2-chimera:free': 'DeepSeek R1T2 Chimera',
+            'tngtech/tng-r1t-chimera:free': 'TNG R1T Chimera',
+            'xiaomi/mimo-v2-flash:free': 'Mimo V2 Flash',
+            'z-ai/glm-4.5-air:free': 'GLM 4.5 Air'
+        };
 
         const state = {
-            messages: [],
-            systemPrompt: '',
-            savedSystemPrompt: '',
-            theme: 'light',
+            chats: [],
+            currentChatId: null,
+            currentChat: null,
+            password: null,
+            isAuthenticated: false,
             isStreaming: false,
             editingMessageId: null,
-            password: null,
-            isAuthenticated: false
+            theme: 'light',
+            sidebarOpen: true,
+            selectedModel: null,
+            systemPrompt: '',
+            searchQuery: '',
+            renamingChatId: null,
+            deletingChatId: null
         };
 
         const elements = {
-            messages: document.getElementById('messages'),
+            sidebar: document.getElementById('sidebar'),
+            menuToggle: document.getElementById('menuToggle'),
+            newChatBtn: document.getElementById('newChatBtn'),
+            searchInput: document.getElementById('searchInput'),
+            chatList: document.getElementById('chatList'),
+            storageInfo: document.getElementById('storageInfo'),
+            headerTitle: document.getElementById('headerTitle'),
+            themeToggle: document.getElementById('themeToggle'),
+            modelSelector: document.getElementById('modelSelector'),
+            systemPrompt: document.getElementById('systemPrompt'),
             chatContainer: document.getElementById('chatContainer'),
+            messages: document.getElementById('messages'),
             inputTextarea: document.getElementById('inputTextarea'),
             sendButton: document.getElementById('sendButton'),
-            systemPrompt: document.getElementById('systemPrompt'),
-            systemPromptSave: document.getElementById('systemPromptSave'),
-            systemPromptStatus: document.getElementById('systemPromptStatus'),
-            themeToggle: document.getElementById('themeToggle'),
-            clearButton: document.getElementById('clearButton'),
             passwordOverlay: document.getElementById('passwordOverlay'),
             passwordInput: document.getElementById('passwordInput'),
             passwordButton: document.getElementById('passwordButton'),
-            passwordError: document.getElementById('passwordError')
+            passwordError: document.getElementById('passwordError'),
+            renameModal: document.getElementById('renameModal'),
+            renameInput: document.getElementById('renameInput'),
+            renameSaveBtn: document.getElementById('renameSaveBtn'),
+            renameCancelBtn: document.getElementById('renameCancelBtn'),
+            deleteModal: document.getElementById('deleteModal'),
+            deleteConfirmBtn: document.getElementById('deleteConfirmBtn'),
+            deleteCancelBtn: document.getElementById('deleteCancelBtn')
         };
 
+        // Initialize model selector
+        function initModelSelector() {
+            const selector = elements.modelSelector;
+            selector.innerHTML = '<option value="">Select a model...</option>';
+            
+            Object.keys(MODELS).sort().forEach(provider => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = provider;
+                
+                MODELS[provider].sort().forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = MODEL_NAMES[model] || model;
+                    optgroup.appendChild(option);
+                });
+                
+                selector.appendChild(optgroup);
+            });
+        }
+
+        // Generate unique ID
         function generateId() {
             return Date.now() + Math.random().toString(36).substr(2, 9);
         }
 
-        function saveToStorage() {
-            const data = {
-                messages: state.messages,
-                savedSystemPrompt: state.savedSystemPrompt,
-                theme: state.theme,
-                timestamp: Date.now()
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        }
-
-        function loadFromStorage() {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (!stored) return false;
-
+        // Storage functions
+        function saveChats() {
             try {
-                const data = JSON.parse(stored);
-                const age = Date.now() - data.timestamp;
-                const expiryMs = EXPIRY_DAYS * 24 * 60 * 60 * 1000;
-
-                if (age > expiryMs) {
-                    localStorage.removeItem(STORAGE_KEY);
-                    return false;
-                }
-
-                state.messages = data.messages || [];
-                state.savedSystemPrompt = data.savedSystemPrompt || '';
-                state.systemPrompt = state.savedSystemPrompt;
-                state.theme = data.theme || 'light';
-                
-                elements.systemPrompt.value = state.systemPrompt;
-                document.documentElement.setAttribute('data-theme', state.theme);
-                updateSystemPromptUI();
-                
-                return true;
+                localStorage.setItem(CHATS_KEY, JSON.stringify(state.chats));
+                updateStorageInfo();
             } catch (e) {
-                console.error('Failed to load from storage:', e);
-                return false;
+                console.error('Failed to save chats:', e);
+                if (e.name === 'QuotaExceededError') {
+                    alert('Storage limit exceeded! Please delete some old chats.');
+                }
             }
         }
 
+        function loadChats() {
+            try {
+                const stored = localStorage.getItem(CHATS_KEY);
+                if (stored) {
+                    state.chats = JSON.parse(stored);
+                    
+                    // Migrate old single chat if exists
+                    const oldChat = localStorage.getItem('deepseek_chat_data');
+                    if (oldChat && state.chats.length === 0) {
+                        const data = JSON.parse(oldChat);
+                        const migratedChat = {
+                            id: generateId(),
+                            name: 'New Chat 1',
+                            messages: data.messages || [],
+                            systemPrompt: data.systemPrompt || '',
+                            model: 'nex-agi/deepseek-v3.1-nex-n1:free',
+                            createdAt: Date.now(),
+                            updatedAt: Date.now(),
+                            pinned: false
+                        };
+                        state.chats.push(migratedChat);
+                        saveChats();
+                        localStorage.removeItem('deepseek_chat_data');
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load chats:', e);
+            }
+        }
+
+        function saveSettings() {
+            const settings = {
+                theme: state.theme,
+                sidebarOpen: state.sidebarOpen
+            };
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            try {
+                const stored = localStorage.getItem(SETTINGS_KEY);
+                if (stored) {
+                    const settings = JSON.parse(stored);
+                    state.theme = settings.theme || 'light';
+                    state.sidebarOpen = settings.sidebarOpen !== false;
+                    
+                    document.documentElement.setAttribute('data-theme', state.theme);
+                    if (!state.sidebarOpen) {
+                        elements.sidebar.classList.add('closed');
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load settings:', e);
+            }
+        }
+
+        function updateStorageInfo() {
+            const chatsSize = JSON.stringify(state.chats).length;
+            const totalSize = chatsSize;
+            const maxSize = 5 * 1024 * 1024; // 5MB estimate
+            const percentage = ((totalSize / maxSize) * 100).toFixed(1);
+            
+            let text = `Storage: ${(totalSize / 1024).toFixed(1)}KB`;
+            if (percentage > 80) {
+                text += ` ⚠️ ${percentage}%`;
+            }
+            
+            elements.storageInfo.textContent = text;
+        }
+
+        // Password functions
         function savePassword(password) {
             sessionStorage.setItem(PASSWORD_KEY, password);
         }
 
         function loadPassword() {
             return sessionStorage.getItem(PASSWORD_KEY);
-        }
-
-        function updateSystemPromptUI() {
-            const currentValue = elements.systemPrompt.value;
-            const hasUnsavedChanges = currentValue !== state.savedSystemPrompt;
-            
-            if (hasUnsavedChanges) {
-                elements.systemPrompt.classList.add('unsaved');
-                elements.systemPromptSave.disabled = false;
-                elements.systemPromptStatus.classList.remove('show');
-            } else {
-                elements.systemPrompt.classList.remove('unsaved');
-                elements.systemPromptSave.disabled = true;
-            }
-        }
-
-        function saveSystemPrompt() {
-            state.savedSystemPrompt = elements.systemPrompt.value;
-            state.systemPrompt = state.savedSystemPrompt;
-            elements.systemPrompt.classList.remove('unsaved');
-            elements.systemPromptSave.disabled = true;
-            
-            elements.systemPromptStatus.textContent = 'Saved';
-            elements.systemPromptStatus.classList.add('show');
-            
-            setTimeout(() => {
-                elements.systemPromptStatus.classList.remove('show');
-            }, 2000);
-            
-            saveToStorage();
         }
 
         async function verifyPassword(password) {
@@ -794,6 +1238,304 @@
             elements.passwordInput.focus();
         }
 
+        // Chat management
+        function createNewChat() {
+            if (state.currentChat && state.currentChat.messages.length > 0) {
+                saveCurrentChat();
+            }
+
+            if (state.chats.length >= MAX_CHATS) {
+                alert(`Maximum ${MAX_CHATS} chats reached. Please delete some old chats.`);
+                return;
+            }
+
+            const chatNumber = state.chats.length + 1;
+            const newChat = {
+                id: generateId(),
+                name: `New Chat ${chatNumber}`,
+                messages: [],
+                systemPrompt: '',
+                model: null,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                pinned: false
+            };
+
+            state.chats.unshift(newChat);
+            saveChats();
+            loadChat(newChat.id);
+            renderChatList();
+        }
+
+        function loadChat(chatId) {
+            if (state.currentChat && state.currentChatId !== chatId) {
+                saveCurrentChat();
+            }
+
+            const chat = state.chats.find(c => c.id === chatId);
+            if (!chat) return;
+
+            state.currentChatId = chatId;
+            state.currentChat = chat;
+
+            elements.systemPrompt.value = chat.systemPrompt || '';
+            state.systemPrompt = chat.systemPrompt || '';
+            
+            if (chat.model) {
+                elements.modelSelector.value = chat.model;
+                state.selectedModel = chat.model;
+                updateHeaderTitle();
+            } else {
+                elements.modelSelector.value = '';
+                state.selectedModel = null;
+                elements.headerTitle.textContent = 'LLM Chat - Select a model';
+            }
+
+            renderMessages();
+            renderChatList();
+            
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        }
+
+        function saveCurrentChat() {
+            if (!state.currentChat) return;
+
+            const chat = state.chats.find(c => c.id === state.currentChatId);
+            if (chat) {
+                chat.messages = state.currentChat.messages;
+                chat.systemPrompt = state.systemPrompt;
+                chat.model = state.selectedModel;
+                chat.updatedAt = Date.now();
+                saveChats();
+            }
+        }
+
+        function deleteChat(chatId) {
+            state.deletingChatId = chatId;
+            elements.deleteModal.classList.add('active');
+        }
+
+        function confirmDeleteChat() {
+            const index = state.chats.findIndex(c => c.id === state.deletingChatId);
+            if (index !== -1) {
+                state.chats.splice(index, 1);
+                
+                if (state.currentChatId === state.deletingChatId) {
+                    if (state.chats.length > 0) {
+                        loadChat(state.chats[0].id);
+                    } else {
+                        createNewChat();
+                    }
+                }
+                
+                saveChats();
+                renderChatList();
+            }
+            
+            elements.deleteModal.classList.remove('active');
+            state.deletingChatId = null;
+        }
+
+        function renameChat(chatId) {
+            const chat = state.chats.find(c => c.id === chatId);
+            if (!chat) return;
+
+            state.renamingChatId = chatId;
+            elements.renameInput.value = chat.name;
+            elements.renameModal.classList.add('active');
+            elements.renameInput.focus();
+        }
+
+        function saveRename() {
+            const chat = state.chats.find(c => c.id === state.renamingChatId);
+            if (!chat) return;
+
+            const newName = elements.renameInput.value.trim();
+            if (newName && newName.length <= 100) {
+                chat.name = newName;
+                saveChats();
+                renderChatList();
+            }
+
+            elements.renameModal.classList.remove('active');
+            state.renamingChatId = null;
+        }
+
+        function togglePinChat(chatId) {
+            const chat = state.chats.find(c => c.id === chatId);
+            if (!chat) return;
+
+            chat.pinned = !chat.pinned;
+            saveChats();
+            renderChatList();
+        }
+
+        async function autoNameChat(chatId, firstMessage, firstResponse) {
+            const chat = state.chats.find(c => c.id === chatId);
+            if (!chat || !chat.name.startsWith('New Chat')) return;
+
+            try {
+                const prompt = `Generate a short, descriptive title (max 50 characters) for this conversation. Only respond with the title, nothing else:\n\nUser: ${firstMessage}\n\nAssistant: ${firstResponse.substring(0, 200)}`;
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Chat-Password': state.password
+                    },
+                    body: JSON.stringify({
+                        model: chat.model,
+                        messages: [{ role: 'user', content: prompt }],
+                        stream: false
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const title = data.choices?.[0]?.message?.content?.trim();
+                    if (title && title.length <= 100) {
+                        chat.name = title;
+                        saveChats();
+                        renderChatList();
+                    }
+                }
+            } catch (error) {
+                console.error('Auto-naming failed:', error);
+            }
+        }
+
+        // UI rendering
+        function renderChatList() {
+            const searchQuery = state.searchQuery.toLowerCase();
+            let filteredChats = state.chats.filter(chat => 
+                chat.name.toLowerCase().includes(searchQuery)
+            );
+
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000;
+            const sevenDays = 7 * oneDay;
+            const thirtyDays = 30 * oneDay;
+
+            const groups = {
+                pinned: filteredChats.filter(c => c.pinned),
+                today: filteredChats.filter(c => !c.pinned && (now - c.updatedAt) < oneDay),
+                yesterday: filteredChats.filter(c => !c.pinned && (now - c.updatedAt) >= oneDay && (now - c.updatedAt) < 2 * oneDay),
+                lastWeek: filteredChats.filter(c => !c.pinned && (now - c.updatedAt) >= 2 * oneDay && (now - c.updatedAt) < sevenDays),
+                lastMonth: filteredChats.filter(c => !c.pinned && (now - c.updatedAt) >= sevenDays && (now - c.updatedAt) < thirtyDays),
+                older: filteredChats.filter(c => !c.pinned && (now - c.updatedAt) >= thirtyDays)
+            };
+
+            elements.chatList.innerHTML = '';
+
+            const groupTitles = {
+                pinned: 'Pinned',
+                today: 'Today',
+                yesterday: 'Yesterday',
+                lastWeek: 'Last 7 Days',
+                lastMonth: 'Last 30 Days',
+                older: 'Older'
+            };
+
+            Object.entries(groups).forEach(([key, chats]) => {
+                if (chats.length === 0) return;
+
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'chat-group';
+
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'chat-group-title';
+                titleDiv.textContent = groupTitles[key];
+                groupDiv.appendChild(titleDiv);
+
+                chats.forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.className = 'chat-item';
+                    if (chat.id === state.currentChatId) {
+                        chatItem.classList.add('active');
+                    }
+                    if (chat.pinned) {
+                        chatItem.classList.add('pinned');
+                    }
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'chat-item-content';
+
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'chat-item-name';
+                    nameDiv.textContent = chat.name;
+                    nameDiv.title = chat.name;
+                    contentDiv.appendChild(nameDiv);
+
+                    chatItem.appendChild(contentDiv);
+
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'chat-item-actions';
+
+                    const pinBtn = document.createElement('button');
+                    pinBtn.className = 'chat-action-btn';
+                    pinBtn.textContent = chat.pinned ? '📌' : '📍';
+                    pinBtn.title = chat.pinned ? 'Unpin' : 'Pin';
+                    pinBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        togglePinChat(chat.id);
+                    };
+
+                    const renameBtn = document.createElement('button');
+                    renameBtn.className = 'chat-action-btn';
+                    renameBtn.textContent = '✏️';
+                    renameBtn.title = 'Rename';
+                    renameBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        renameChat(chat.id);
+                    };
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'chat-action-btn';
+                    deleteBtn.textContent = '🗑️';
+                    deleteBtn.title = 'Delete';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteChat(chat.id);
+                    };
+
+                    actionsDiv.appendChild(pinBtn);
+                    actionsDiv.appendChild(renameBtn);
+                    actionsDiv.appendChild(deleteBtn);
+                    chatItem.appendChild(actionsDiv);
+
+                    chatItem.onclick = () => loadChat(chat.id);
+
+                    groupDiv.appendChild(chatItem);
+                });
+
+                elements.chatList.appendChild(groupDiv);
+            });
+        }
+
+        function updateHeaderTitle() {
+            if (state.selectedModel) {
+                const modelName = MODEL_NAMES[state.selectedModel] || state.selectedModel;
+                elements.headerTitle.textContent = modelName;
+            } else {
+                elements.headerTitle.textContent = 'LLM Chat - Select a model';
+            }
+        }
+
+        function toggleSidebar() {
+            state.sidebarOpen = !state.sidebarOpen;
+            elements.sidebar.classList.toggle('closed');
+            saveSettings();
+        }
+
+        function toggleTheme() {
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', state.theme);
+            saveSettings();
+        }
+
+        // Message rendering
         function parseMarkdown(text) {
             let html = text;
 
@@ -889,7 +1631,7 @@
             }
 
             state.editingMessageId = messageId;
-            const message = state.messages.find(m => m.id === messageId);
+            const message = state.currentChat.messages.find(m => m.id === messageId);
             const wrapper = elements.messages.querySelector(`[data-message-id="${messageId}"]`);
             const editContainer = wrapper.querySelector('.edit-container');
             const textarea = editContainer.querySelector('.edit-textarea');
@@ -902,7 +1644,7 @@
         }
 
         function saveEdit(messageId) {
-            const message = state.messages.find(m => m.id === messageId);
+            const message = state.currentChat.messages.find(m => m.id === messageId);
             const wrapper = elements.messages.querySelector(`[data-message-id="${messageId}"]`);
             const editContainer = wrapper.querySelector('.edit-container');
             const textarea = editContainer.querySelector('.edit-textarea');
@@ -926,7 +1668,7 @@
             editContainer.classList.remove('active');
             state.editingMessageId = null;
 
-            saveToStorage();
+            saveCurrentChat();
         }
 
         function cancelEdit(messageId) {
@@ -942,24 +1684,24 @@
         function renderMessages() {
             elements.messages.innerHTML = '';
             
-            if (state.messages.length === 0) {
+            if (!state.currentChat || state.currentChat.messages.length === 0) {
                 elements.messages.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-title">Welcome to DeepSeek Chat</div>
-                        <div class="empty-state-subtitle">Start a conversation by typing a message below</div>
+                        <div class="empty-state-title">Start a Conversation</div>
+                        <div class="empty-state-subtitle">Select a model and type a message below</div>
                     </div>
                 `;
                 return;
             }
 
-            state.messages.forEach(message => {
+            state.currentChat.messages.forEach(message => {
                 elements.messages.appendChild(renderMessage(message));
             });
 
             scrollToBottom();
         }
-        
-function scrollToBottom() {
+
+        function scrollToBottom() {
             elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
         }
 
@@ -969,17 +1711,17 @@ function scrollToBottom() {
                 role,
                 content
             };
-            state.messages.push(message);
+            state.currentChat.messages.push(message);
             elements.messages.appendChild(renderMessage(message));
             scrollToBottom();
-            saveToStorage();
+            saveCurrentChat();
             return message;
         }
 
         function updateLastMessage(content) {
-            if (state.messages.length === 0) return;
+            if (!state.currentChat || state.currentChat.messages.length === 0) return;
             
-            const lastMessage = state.messages[state.messages.length - 1];
+            const lastMessage = state.currentChat.messages[state.currentChat.messages.length - 1];
             lastMessage.content = content;
             
             const lastWrapper = elements.messages.lastElementChild;
@@ -995,15 +1737,16 @@ function scrollToBottom() {
         }
 
         function removeLastMessage() {
-            if (state.messages.length === 0) return;
-            state.messages.pop();
+            if (!state.currentChat || state.currentChat.messages.length === 0) return;
+            state.currentChat.messages.pop();
             if (elements.messages.lastElementChild) {
                 elements.messages.removeChild(elements.messages.lastElementChild);
             }
         }
 
+        // API communication
         async function sendMessage(userMessage, retryCount = 0) {
-            if (state.isStreaming || !state.isAuthenticated) return;
+            if (state.isStreaming || !state.isAuthenticated || !state.selectedModel) return;
 
             state.isStreaming = true;
             elements.sendButton.disabled = true;
@@ -1011,14 +1754,14 @@ function scrollToBottom() {
 
             const messages = [];
             
-            if (state.savedSystemPrompt.trim()) {
+            if (state.systemPrompt.trim()) {
                 messages.push({
                     role: 'system',
-                    content: state.savedSystemPrompt.trim()
+                    content: state.systemPrompt.trim()
                 });
             }
 
-            state.messages
+            state.currentChat.messages
                 .filter(m => m.role === 'user' || m.role === 'assistant')
                 .forEach(m => {
                     messages.push({
@@ -1026,6 +1769,8 @@ function scrollToBottom() {
                         content: m.content
                     });
                 });
+
+            const isFirstMessage = state.currentChat.messages.filter(m => m.role === 'user').length === 1;
 
             try {
                 const response = await fetch(API_URL, {
@@ -1035,7 +1780,7 @@ function scrollToBottom() {
                         'X-Chat-Password': state.password
                     },
                     body: JSON.stringify({
-                        model: MODEL,
+                        model: state.selectedModel,
                         messages: messages,
                         stream: true
                     })
@@ -1084,7 +1829,12 @@ function scrollToBottom() {
                     }
                 }
 
-                saveToStorage();
+                saveCurrentChat();
+                
+                // Auto-name chat after first response
+                if (isFirstMessage && state.currentChat.name.startsWith('New Chat')) {
+                    autoNameChat(state.currentChatId, userMessage, assistantMessage.content);
+                }
             } catch (error) {
                 console.error('Error sending message:', error);
                 
@@ -1105,7 +1855,11 @@ function scrollToBottom() {
 
         function handleSend() {
             const message = elements.inputTextarea.value.trim();
-            if (!message || state.isStreaming || !state.isAuthenticated) return;
+            if (!message || state.isStreaming || !state.isAuthenticated || !state.selectedModel) return;
+
+            if (!state.currentChat) {
+                createNewChat();
+            }
 
             addMessage('user', message);
             elements.inputTextarea.value = '';
@@ -1114,29 +1868,12 @@ function scrollToBottom() {
             sendMessage(message);
         }
 
-        function handleClear() {
-            if (state.isStreaming) return;
-            
-            if (state.messages.length > 0) {
-                if (confirm('Are you sure you want to clear the chat?')) {
-                    state.messages = [];
-                    renderMessages();
-                    saveToStorage();
-                }
-            }
-        }
-
-        function toggleTheme() {
-            state.theme = state.theme === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', state.theme);
-            saveToStorage();
-        }
-
-        elements.sendButton.addEventListener('click', handleSend);
-        elements.clearButton.addEventListener('click', handleClear);
+        // Event listeners
+        elements.menuToggle.addEventListener('click', toggleSidebar);
         elements.themeToggle.addEventListener('click', toggleTheme);
+        elements.newChatBtn.addEventListener('click', createNewChat);
+        elements.sendButton.addEventListener('click', handleSend);
         elements.passwordButton.addEventListener('click', handlePasswordSubmit);
-        elements.systemPromptSave.addEventListener('click', saveSystemPrompt);
 
         elements.passwordInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -1159,11 +1896,73 @@ function scrollToBottom() {
 
         elements.systemPrompt.addEventListener('input', (e) => {
             state.systemPrompt = e.target.value;
-            updateSystemPromptUI();
+            saveCurrentChat();
         });
 
-        loadFromStorage();
-        renderMessages();
+        elements.modelSelector.addEventListener('change', (e) => {
+            state.selectedModel = e.target.value || null;
+            if (state.currentChat) {
+                state.currentChat.model = state.selectedModel;
+                saveCurrentChat();
+            }
+            updateHeaderTitle();
+        });
+
+        elements.searchInput.addEventListener('input', (e) => {
+            state.searchQuery = e.target.value;
+            renderChatList();
+        });
+
+        elements.renameSaveBtn.addEventListener('click', saveRename);
+        elements.renameCancelBtn.addEventListener('click', () => {
+            elements.renameModal.classList.remove('active');
+            state.renamingChatId = null;
+        });
+
+        elements.renameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveRename();
+            } else if (e.key === 'Escape') {
+                elements.renameModal.classList.remove('active');
+                state.renamingChatId = null;
+            }
+        });
+
+        elements.deleteConfirmBtn.addEventListener('click', confirmDeleteChat);
+        elements.deleteCancelBtn.addEventListener('click', () => {
+            elements.deleteModal.classList.remove('active');
+            state.deletingChatId = null;
+        });
+
+        // Close modals on outside click
+        elements.renameModal.addEventListener('click', (e) => {
+            if (e.target === elements.renameModal) {
+                elements.renameModal.classList.remove('active');
+                state.renamingChatId = null;
+            }
+        });
+
+        elements.deleteModal.addEventListener('click', (e) => {
+            if (e.target === elements.deleteModal) {
+                elements.deleteModal.classList.remove('active');
+                state.deletingChatId = null;
+            }
+        });
+
+        // Initialize app
+        initModelSelector();
+        loadSettings();
+        loadChats();
+        
+        if (state.chats.length === 0) {
+            createNewChat();
+        } else {
+            loadChat(state.chats[0].id);
+        }
+        
+        renderChatList();
+        updateStorageInfo();
         checkAuthentication();
     </script>
 </body>
