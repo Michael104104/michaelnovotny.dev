@@ -2,66 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CABS Learner</title>
     <style>
-        /* ========== GLOBAL STYLES ========== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: rgba(74, 158, 255, 0.3);
-        }
-
-        :root {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --bg-tertiary: #3a3a3a;
-            --text-primary: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --accent: #4a9eff;
-            --accent-hover: #357abd;
-            --success: #4caf50;
-            --error: #f44336;
-            --warning: #ff9800;
-            --border: #4a4a4a;
-        }
-
-        body.light-mode {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --bg-tertiary: #e0e0e0;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --accent: #2196f3;
-            --accent-hover: #1976d2;
-            --border: #cccccc;
-        }
-
+        /* ========== RESET & BASE ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background: #1a1a1a;
+            color: #e0e0e0;
             line-height: 1.6;
             min-height: 100vh;
             transition: background 0.3s, color 0.3s;
-            -webkit-font-smoothing: antialiased;
         }
-
-        /* ========== TOUCH-FRIENDLY BUTTONS ========== */
-        button, .nav-tab, .preset-btn, .icon-btn, .toggle-steps-btn {
-            touch-action: manipulation;
-            -webkit-user-select: none;
-            user-select: none;
-            cursor: pointer;
-        }
+        
+        /* ========== LIGHT MODE ========== */
+        body.light-mode { background: #ffffff; color: #1a1a1a; }
+        body.light-mode header { background: #f5f5f5; border-color: #ccc; }
+        body.light-mode .nav-tab { background: #f5f5f5; border-color: #ccc; color: #1a1a1a; }
+        body.light-mode .nav-tab.active { background: #2196f3; color: white; border-color: #2196f3; }
+        body.light-mode .section { background: #f5f5f5; }
+        body.light-mode .icon-btn { background: #e0e0e0; border-color: #ccc; color: #1a1a1a; }
+        body.light-mode input, body.light-mode select { background: #fff; border-color: #ccc; color: #1a1a1a; }
+        body.light-mode .preset-btn { background: #e0e0e0; border-color: #ccc; color: #1a1a1a; }
+        body.light-mode .preset-btn.active { background: #2196f3; color: white; border-color: #2196f3; }
+        body.light-mode .output-item { background: #e0e0e0; border-color: #ccc; }
+        body.light-mode .question-prompt { background: #e0e0e0; }
+        body.light-mode .steps-section { background: #e0e0e0; border-color: #ccc; }
+        body.light-mode .stat-card { background: #e0e0e0; }
+        body.light-mode .question-item { background: #e0e0e0; }
+        body.light-mode .toggle-steps-btn { background: #fff; border-color: #ccc; color: #1a1a1a; }
+        body.light-mode .modal-content { background: #f5f5f5; }
+        body.light-mode .close-btn { background: #e0e0e0; border-color: #ccc; color: #1a1a1a; }
+        body.light-mode label { color: #666; }
+        body.light-mode .output-label { color: #666; }
+        body.light-mode .question-number { color: #666; }
+        body.light-mode .stat-label { color: #666; }
+        body.light-mode .tutorial-section p { color: #666; }
 
         /* ========== HEADER ========== */
         header {
-            background: var(--bg-secondary);
+            background: #2d2d2d;
             padding: 1rem;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 2px solid #4a4a4a;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -75,36 +59,25 @@
             align-items: center;
         }
 
-        h1 {
-            font-size: 1.5rem;
-            color: var(--accent);
-        }
+        h1 { font-size: 1.5rem; color: #4a9eff; }
 
-        .header-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
+        .header-buttons { display: flex; gap: 0.5rem; }
 
         .icon-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
+            background: #3a3a3a;
+            border: 1px solid #4a4a4a;
+            color: #e0e0e0;
             width: 44px;
             height: 44px;
-            min-width: 44px;
-            min-height: 44px;
             border-radius: 8px;
             font-size: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            cursor: pointer;
         }
 
-        .icon-btn:active {
-            transform: scale(0.95);
-            background: var(--accent);
-        }
+        .icon-btn:active { transform: scale(0.95); }
 
         /* ========== NAVIGATION ========== */
         .nav-tabs {
@@ -118,57 +91,47 @@
         .nav-tab {
             flex: 1;
             padding: 1rem;
-            min-height: 48px;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border);
+            background: #2d2d2d;
+            border: 2px solid #4a4a4a;
             border-radius: 8px;
-            color: var(--text-primary);
+            color: #e0e0e0;
             font-size: 1rem;
             font-weight: 500;
-            transition: all 0.2s;
+            cursor: pointer;
         }
 
         .nav-tab.active {
-            background: var(--accent);
+            background: #4a9eff;
             color: white;
-            border-color: var(--accent);
+            border-color: #4a9eff;
         }
 
-        .nav-tab:active {
-            transform: scale(0.98);
-        }
+        .nav-tab:active { transform: scale(0.98); }
 
-        /* ========== MAIN CONTAINER ========== */
+        /* ========== CONTAINER ========== */
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 1rem;
         }
 
-        .view {
-            display: none;
-        }
+        .view { display: none; }
+        .view.active { display: block; }
 
-        .view.active {
-            display: block;
-        }
-
-        /* ========== CONVERTER MODE ========== */
-        .converter-section {
-            background: var(--bg-secondary);
+        .section {
+            background: #2d2d2d;
             padding: 1.5rem;
             border-radius: 12px;
             margin-bottom: 1rem;
         }
 
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
+        /* ========== FORMS ========== */
+        .input-group { margin-bottom: 1.5rem; }
 
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: var(--text-secondary);
+            color: #a0a0a0;
             font-size: 0.9rem;
             font-weight: 500;
         }
@@ -177,10 +140,10 @@
             width: 100%;
             padding: 0.75rem;
             min-height: 48px;
-            background: var(--bg-tertiary);
-            border: 2px solid var(--border);
+            background: #3a3a3a;
+            border: 2px solid #4a4a4a;
             border-radius: 8px;
-            color: var(--text-primary);
+            color: #e0e0e0;
             font-size: 1rem;
             font-family: 'Courier New', monospace;
             -webkit-appearance: none;
@@ -196,28 +159,27 @@
 
         input:focus, select:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: #4a9eff;
         }
 
         input.invalid {
-            border-color: var(--error);
+            border-color: #f44336;
             background: rgba(244, 67, 54, 0.1);
         }
 
-        .output-section {
-            margin-top: 1.5rem;
-        }
+        /* ========== CONVERTER OUTPUT ========== */
+        .output-section { margin-top: 1rem; }
 
         .output-item {
-            background: var(--bg-tertiary);
+            background: #3a3a3a;
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 0.75rem;
-            border: 2px solid var(--border);
+            border: 2px solid #4a4a4a;
         }
 
         .output-label {
-            color: var(--text-secondary);
+            color: #a0a0a0;
             font-size: 0.85rem;
             margin-bottom: 0.25rem;
         }
@@ -225,17 +187,11 @@
         .output-value {
             font-family: 'Courier New', monospace;
             font-size: 1.1rem;
-            color: var(--accent);
+            color: #4a9eff;
             word-break: break-all;
         }
 
-        /* ========== DRILL MODE ========== */
-        .drill-setup, .drill-question, .drill-summary {
-            background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: 12px;
-        }
-
+        /* ========== DRILL SETUP ========== */
         .preset-buttons {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -246,102 +202,93 @@
         .preset-btn {
             padding: 1rem;
             min-height: 48px;
-            background: var(--bg-tertiary);
-            border: 2px solid var(--border);
+            background: #3a3a3a;
+            border: 2px solid #4a4a4a;
             border-radius: 8px;
-            color: var(--text-primary);
+            color: #e0e0e0;
             font-size: 1rem;
             font-weight: 500;
-            transition: all 0.2s;
+            cursor: pointer;
         }
 
         .preset-btn.active {
-            background: var(--accent);
+            background: #4a9eff;
             color: white;
-            border-color: var(--accent);
+            border-color: #4a9eff;
         }
 
-        .preset-btn:active {
-            transform: scale(0.98);
-        }
+        .preset-btn:active { transform: scale(0.98); }
 
         .range-inputs {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.75rem;
-            margin-bottom: 1rem;
         }
 
         .btn-primary {
             width: 100%;
             padding: 1rem;
             min-height: 52px;
-            background: var(--accent);
+            background: #4a9eff;
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 1.1rem;
             font-weight: 600;
-            transition: all 0.2s;
+            cursor: pointer;
             margin-top: 1rem;
         }
 
         .btn-primary:active {
             transform: scale(0.98);
-            background: var(--accent-hover);
+            background: #357abd;
         }
 
-        .btn-secondary {
-            width: 100%;
-            padding: 0.75rem;
-            min-height: 48px;
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.2s;
-            margin-top: 0.5rem;
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            min-height: 44px;
         }
 
-        .btn-secondary:active {
-            transform: scale(0.98);
+        .checkbox-group label { margin-bottom: 0; flex: 1; }
+
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            cursor: pointer;
+            accent-color: #4a9eff;
         }
 
-        /* Question Display */
+        /* ========== DRILL QUESTION ========== */
         .question-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 2px solid #4a4a4a;
         }
 
-        .question-number {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .timer {
-            color: var(--accent);
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-        }
+        .question-number { color: #a0a0a0; font-size: 0.9rem; }
+        .timer { color: #4a9eff; font-family: 'Courier New', monospace; font-size: 1rem; font-weight: bold; }
 
         .question-prompt {
-            background: var(--bg-tertiary);
+            background: #3a3a3a;
             padding: 1.5rem;
             border-radius: 8px;
             text-align: center;
             margin-bottom: 1.5rem;
-            font-size: 1.2rem;
         }
 
         .question-value {
             font-family: 'Courier New', monospace;
-            font-size: 1.8rem;
-            color: var(--accent);
+            font-size: 2rem;
+            color: #4a9eff;
             margin: 0.5rem 0;
+            word-break: break-all;
         }
 
         .feedback {
@@ -355,33 +302,38 @@
 
         .feedback.correct {
             background: rgba(76, 175, 80, 0.2);
-            color: var(--success);
-            border: 2px solid var(--success);
+            color: #4caf50;
+            border: 2px solid #4caf50;
         }
 
         .feedback.incorrect {
             background: rgba(244, 67, 54, 0.2);
-            color: var(--error);
-            border: 2px solid var(--error);
+            color: #f44336;
+            border: 2px solid #f44336;
+        }
+
+        .correct-answer {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
         }
 
         .steps-section {
-            background: var(--bg-tertiary);
+            background: #3a3a3a;
             padding: 1rem;
             border-radius: 8px;
             margin: 1rem 0;
-            border: 2px solid var(--border);
+            border: 2px solid #4a4a4a;
         }
 
         .steps-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            min-height: 44px;
-            touch-action: manipulation;
             cursor: pointer;
-            -webkit-user-select: none;
-            user-select: none;
+            min-height: 44px;
+            font-weight: 500;
         }
 
         .steps-content {
@@ -390,18 +342,18 @@
             font-size: 0.9rem;
             line-height: 1.8;
             display: none;
+            padding-top: 1rem;
+            border-top: 1px solid #4a4a4a;
         }
 
-        .steps-content.visible {
-            display: block;
-        }
+        .steps-content.visible { display: block; }
 
         .step {
             margin-bottom: 0.5rem;
             padding-left: 1rem;
         }
 
-        /* Summary */
+        /* ========== DRILL SUMMARY ========== */
         .summary-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -410,67 +362,60 @@
         }
 
         .stat-card {
-            background: var(--bg-tertiary);
+            background: #3a3a3a;
             padding: 1rem;
             border-radius: 8px;
             text-align: center;
         }
 
         .stat-value {
-            font-size: 1.5rem;
-            color: var(--accent);
-            font-weight: 600;
+            font-size: 1.8rem;
+            color: #4a9eff;
+            font-weight: 700;
         }
 
         .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.75rem;
+            color: #a0a0a0;
+            font-size: 0.8rem;
             margin-top: 0.25rem;
         }
 
-        .question-list {
-            margin-top: 1.5rem;
-        }
+        .question-list { margin-top: 1.5rem; }
 
         .question-item {
-            background: var(--bg-tertiary);
+            background: #3a3a3a;
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 0.75rem;
-            border-left: 4px solid var(--border);
+            border-left: 4px solid #4a4a4a;
         }
 
-        .question-item.correct {
-            border-left-color: var(--success);
-        }
-
-        .question-item.incorrect {
-            border-left-color: var(--error);
-        }
+        .question-item.correct { border-left-color: #4caf50; }
+        .question-item.incorrect { border-left-color: #f44336; }
 
         .question-detail {
             display: flex;
             justify-content: space-between;
             font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .toggle-steps-btn {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-            padding: 0.75rem 1rem;
-            min-height: 44px;
+            background: #2d2d2d;
+            color: #e0e0e0;
+            border: 1px solid #4a4a4a;
+            padding: 0.5rem 1rem;
+            min-height: 40px;
             border-radius: 6px;
+            cursor: pointer;
             font-size: 0.85rem;
             margin-top: 0.5rem;
         }
 
-        .toggle-steps-btn:active {
-            background: var(--accent);
-            color: white;
-        }
+        .toggle-steps-btn:active { transform: scale(0.98); }
 
         /* ========== MODAL ========== */
         .modal {
@@ -480,7 +425,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             z-index: 1000;
             padding: 1rem;
             overflow-y: auto;
@@ -493,13 +438,13 @@
         }
 
         .modal-content {
-            background: var(--bg-secondary);
+            background: #2d2d2d;
             border-radius: 12px;
             padding: 1.5rem;
             max-width: 600px;
             width: 100%;
             margin: 2rem 0;
-            max-height: 90vh;
+            max-height: calc(100vh - 4rem);
             overflow-y: auto;
         }
 
@@ -508,176 +453,106 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 2px solid #4a4a4a;
+            padding-bottom: 0.75rem;
         }
 
-        .modal-title {
-            font-size: 1.3rem;
-            color: var(--accent);
-        }
+        .modal-title { font-size: 1.3rem; color: #4a9eff; }
 
         .close-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
+            background: #3a3a3a;
+            border: 1px solid #4a4a4a;
+            color: #e0e0e0;
             font-size: 1.5rem;
             width: 44px;
             height: 44px;
-            min-width: 44px;
-            min-height: 44px;
             border-radius: 8px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            touch-action: manipulation;
-            cursor: pointer;
         }
 
-        .close-btn:active {
-            background: var(--accent);
-        }
+        .close-btn:active { transform: scale(0.95); }
 
-        .tutorial-section {
-            margin-bottom: 1.5rem;
-        }
+        .tutorial-section { margin-bottom: 1.5rem; }
+        .tutorial-section h3 { color: #4a9eff; margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .tutorial-section p { color: #a0a0a0; margin-bottom: 0.5rem; line-height: 1.5; }
+        .tutorial-section p strong { color: #e0e0e0; }
 
-        .tutorial-section h3 {
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
-        .tutorial-section p {
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-        }
-
-        .tutorial-section code {
-            background: var(--bg-tertiary);
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* ========== CHECKBOX ========== */
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-            min-height: 44px;
-        }
-
-        .checkbox-group label {
-            margin-bottom: 0;
-            flex: 1;
-        }
-
-        input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            min-height: 24px;
-            cursor: pointer;
-            accent-color: var(--accent);
-        }
+        /* ========== UTILITIES ========== */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mb-1 { margin-bottom: 1rem; }
 
         /* ========== RESPONSIVE ========== */
         @media (max-width: 480px) {
-            h1 {
-                font-size: 1.2rem;
-            }
-
-            .range-inputs {
-                grid-template-columns: 1fr;
-            }
-
-            .summary-stats {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-value {
-                font-size: 2rem;
-            }
-
-            .stat-label {
-                font-size: 0.85rem;
-            }
-        }
-
-        /* ========== UTILITY ========== */
-        .hidden {
-            display: none !important;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mb-1 {
-            margin-bottom: 1rem;
+            h1 { font-size: 1.3rem; }
+            .summary-stats { grid-template-columns: 1fr; }
+            .range-inputs { grid-template-columns: 1fr; }
+            .stat-value { font-size: 2rem; }
+            .question-value { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- ========== HEADER ========== -->
     <header>
         <div class="header-content">
             <h1>CABS Learner</h1>
             <div class="header-buttons">
-                <button type="button" class="icon-btn" id="themeToggle" aria-label="Toggle Theme">🌙</button>
-                <button type="button" class="icon-btn" id="tutorialBtn" aria-label="Tutorial">❓</button>
+                <button type="button" class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+                <button type="button" class="icon-btn" onclick="openTutorial()">❓</button>
             </div>
         </div>
     </header>
 
-    <!-- Navigation -->
+    <!-- ========== NAVIGATION ========== -->
     <div class="nav-tabs">
-        <button type="button" class="nav-tab active" data-view="converter">Converter</button>
-        <button type="button" class="nav-tab" data-view="drill">Drill</button>
+        <button type="button" class="nav-tab active" id="converterTabBtn" onclick="switchView('converter')">Converter</button>
+        <button type="button" class="nav-tab" id="drillTabBtn" onclick="switchView('drill')">Drill</button>
     </div>
 
-    <!-- Main Container -->
+    <!-- ========== MAIN CONTAINER ========== -->
     <div class="container">
-        <!-- Converter View -->
+        
+        <!-- ===== CONVERTER VIEW ===== -->
         <div id="converterView" class="view active">
-            <div class="converter-section">
+            <div class="section">
                 <div class="input-group">
                     <label for="inputValue">Input Value</label>
-                    <input type="text" id="inputValue" placeholder="Enter value..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    <input type="text" id="inputValue" placeholder="Enter value..." oninput="updateConverter()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                 </div>
-
                 <div class="input-group">
                     <label for="inputBase">Input Base</label>
-                    <select id="inputBase">
-                        <option value="decimal">Decimal</option>
-                        <option value="binary">Binary</option>
-                        <option value="hex">Hexadecimal</option>
+                    <select id="inputBase" onchange="updateConverter()">
+                        <option value="decimal">Decimal (0-9)</option>
+                        <option value="binary">Binary (0-1)</option>
+                        <option value="hex">Hexadecimal (0-9, A-F)</option>
                     </select>
                 </div>
-
                 <div class="input-group">
                     <label for="outputBase">Output Bases</label>
-                    <select id="outputBase">
+                    <select id="outputBase" onchange="updateConverter()">
                         <option value="all">All Bases</option>
                         <option value="decimal">Decimal</option>
                         <option value="binary">Binary</option>
                         <option value="hex">Hexadecimal</option>
                     </select>
                 </div>
-
                 <div class="output-section" id="outputSection"></div>
             </div>
         </div>
 
-        <!-- Drill View -->
+        <!-- ===== DRILL VIEW ===== -->
         <div id="drillView" class="view">
+            
             <!-- Drill Setup -->
-            <div id="drillSetup" class="drill-setup">
+            <div id="drillSetup" class="section">
                 <div class="input-group">
                     <label for="conversionType">Conversion Type</label>
-                    <select id="conversionType">
-                        <option value="random">Random</option>
+                    <select id="conversionType" onchange="saveSettings()">
+                        <option value="random">Random (All Types)</option>
                         <option value="dec-to-bin">Decimal → Binary</option>
                         <option value="bin-to-dec">Binary → Decimal</option>
                         <option value="dec-to-hex">Decimal → Hexadecimal</option>
@@ -690,15 +565,880 @@
                 <div class="input-group">
                     <label>Difficulty Preset</label>
                     <div class="preset-buttons">
-                        <button type="button" class="preset-btn active" data-preset="easy">Easy</button>
-                        <button type="button" class="preset-btn" data-preset="medium">Medium</button>
-                        <button type="button" class="preset-btn" data-preset="hard">Hard</button>
-                        <button type="button" class="preset-btn" data-preset="custom">Custom</button>
+                        <button type="button" class="preset-btn active" id="presetEasy" onclick="setPreset('easy')">Easy (1-15)</button>
+                        <button type="button" class="preset-btn" id="presetMedium" onclick="setPreset('medium')">Medium (16-255)</button>
+                        <button type="button" class="preset-btn" id="presetHard" onclick="setPreset('hard')">Hard (256-4095)</button>
+                        <button type="button" class="preset-btn" id="presetCustom" onclick="setPreset('custom')">Custom</button>
                     </div>
                 </div>
 
-                <div class="input-group" id="customRangeGroup">
-                    <label>Custom Range</label>
+                <div class="input-group" id="customRangeGroup" style="opacity: 0.5;">
+                    <label>Custom Range (Decimal Values)</label>
                     <div class="range-inputs">
-                        <input type="number" id="rangeMin" placeholder="Min" value="1" inputmode="numeric">
-                        <input type="number" id="rangeMax" placeholder="Max" value="15" inputmode="numeric">
+                        <input type="number" id="rangeMin" value="1" placeholder="Min" disabled oninput="updateCustomRange()">
+                        <input type="number" id="rangeMax" value="15" placeholder="Max" disabled oninput="updateCustomRange()">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="questionCount">Number of Questions</label>
+                    <input type="number" id="questionCount" value="10" min="1" max="100" inputmode="numeric" onchange="saveSettings()">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="timeLimitEnabled" onchange="toggleTimeLimit()">
+                    <label for="timeLimitEnabled">Enable Time Limit</label>
+                </div>
+
+                <div class="input-group hidden" id="timeLimitGroup">
+                    <label for="timeLimit">Seconds Per Question</label>
+                    <input type="number" id="timeLimit" value="30" min="5" max="300" inputmode="numeric" onchange="saveSettings()">
+                </div>
+
+                <button type="button" class="btn-primary" onclick="startDrill()">Start Drill</button>
+            </div>
+
+            <!-- Drill Question -->
+            <div id="drillQuestion" class="section hidden">
+                <div class="question-header">
+                    <span class="question-number" id="questionProgress">Question 1 of 10</span>
+                    <span class="timer" id="timer"></span>
+                </div>
+
+                <div class="question-prompt">
+                    <div id="questionText">Convert to Binary:</div>
+                    <div class="question-value" id="questionValue">42</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="answerInput">Your Answer</label>
+                    <input type="text" id="answerInput" placeholder="Enter your answer..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeypress="handleAnswerKey(event)">
+                </div>
+
+                <div id="feedbackSection" class="hidden">
+                    <div class="feedback" id="feedbackMessage"></div>
+                    <div class="correct-answer" id="correctAnswerDisplay"></div>
+                    
+                    <div class="steps-section">
+                        <div class="steps-header" onclick="toggleSteps()">
+                            <span>📝 Show Steps</span>
+                            <span id="stepsToggle">▼</span>
+                        </div>
+                        <div class="steps-content" id="stepsContent"></div>
+                    </div>
+
+                    <button type="button" class="btn-primary" onclick="continueToNext()">Continue (Enter)</button>
+                </div>
+
+                <button type="button" class="btn-primary" id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
+            </div>
+
+            <!-- Drill Summary -->
+            <div id="drillSummary" class="section hidden">
+                <h2 class="text-center mb-1">Drill Complete! 🎉</h2>
+
+                <div class="summary-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="accuracyStat">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalTimeStat">0s</div>
+                        <div class="stat-label">Total Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgTimeStat">0s</div>
+                        <div class="stat-label">Avg Time</div>
+                    </div>
+                </div>
+
+                <h3 class="mb-1">Questions Review</h3>
+                <div id="questionList"></div>
+
+                <button type="button" class="btn-primary" onclick="resetDrill()">Start New Drill</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TUTORIAL MODAL ========== -->
+    <div class="modal" id="tutorialModal" onclick="closeTutorialIfBackground(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Tutorial</h2>
+                <button type="button" class="close-btn" onclick="closeTutorial()">×</button>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>About CABS Learner</h3>
+                <p>CABS Learner helps you master number system conversions between <strong>Decimal</strong>, <strong>Binary</strong>, and <strong>Hexadecimal</strong>.</p>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>Converter Mode</h3>
+                <p>Practice conversions at your own pace. Enter any number in any base and see instant conversions.</p>
+                <p><strong>Valid characters by base:</strong></p>
+                <p>• Decimal: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9</p>
+                <p>• Binary: 0, 1</p>
+                <p>• Hexadecimal: 0-9, A, B, C, D, E, F</p>
+                <p>Invalid characters are highlighted but not blocked.</p>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>Drill Mode</h3>
+                <p>Test your skills with timed practice sessions. Configure your drill:</p>
+                <p>• <strong>Conversion Type:</strong> Choose specific conversions or random</p>
+                <p>• <strong>Difficulty:</strong> Easy (1-15), Medium (16-255), Hard (256-4095), or Custom</p>
+                <p>• <strong>Time Limit:</strong> Optional countdown per question</p>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>Conversion Methods</h3>
+                <p><strong>Decimal → Binary:</strong> Repeatedly divide by 2, read remainders from bottom to top.</p>
+                <p><strong>Binary → Decimal:</strong> Sum powers of 2 for each 1 bit (rightmost = 2⁰).</p>
+                <p><strong>Binary → Hex:</strong> Group into 4 bits from right, convert each group (0000=0 to 1111=F).</p>
+                <p><strong>Hex → Binary:</strong> Convert each hex digit to 4 bits.</p>
+                <p><strong>Decimal → Hex:</strong> Divide by 16 repeatedly (or divide by 2 four times per digit).</p>
+                <p><strong>Hex → Decimal:</strong> Multiply each digit by 16^position and sum.</p>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>Tips</h3>
+                <p>• Use <strong>Show Steps</strong> to understand the conversion process</p>
+                <p>• Start with Easy difficulty and work your way up</p>
+                <p>• Press <strong>Enter</strong> to quickly submit answers or continue</p>
+                <p>• Your settings are automatically saved</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script>
+        // ============================================================
+        // STATE VARIABLES
+        // ============================================================
+        var theme = 'dark';
+        var preset = 'easy';
+        var rangeMin = 1;
+        var rangeMax = 15;
+        var questions = [];
+        var currentIndex = 0;
+        var answers = [];
+        var drillStartTime = 0;
+        var questionStartTime = 0;
+        var timerInterval = null;
+
+        // ============================================================
+        // THEME FUNCTIONS
+        // ============================================================
+        function toggleTheme() {
+            theme = (theme === 'dark') ? 'light' : 'dark';
+            document.body.classList.toggle('light-mode', theme === 'light');
+            document.getElementById('themeBtn').textContent = (theme === 'dark') ? '🌙' : '☀️';
+            saveSettings();
+        }
+
+        // ============================================================
+        // VIEW NAVIGATION
+        // ============================================================
+        function switchView(view) {
+            // Update tab buttons
+            document.getElementById('converterTabBtn').classList.toggle('active', view === 'converter');
+            document.getElementById('drillTabBtn').classList.toggle('active', view === 'drill');
+            
+            // Update views
+            document.getElementById('converterView').classList.toggle('active', view === 'converter');
+            document.getElementById('drillView').classList.toggle('active', view === 'drill');
+        }
+
+        // ============================================================
+        // TUTORIAL MODAL
+        // ============================================================
+        function openTutorial() {
+            document.getElementById('tutorialModal').classList.add('active');
+        }
+
+        function closeTutorial() {
+            document.getElementById('tutorialModal').classList.remove('active');
+        }
+
+        function closeTutorialIfBackground(e) {
+            if (e.target.id === 'tutorialModal') {
+                closeTutorial();
+            }
+        }
+
+        // ============================================================
+        // INPUT VALIDATION
+        // ============================================================
+        function isValidInput(value, base) {
+            if (!value || value.length === 0) return true;
+            if (base === 'decimal') return /^[0-9]+$/.test(value);
+            if (base === 'binary') return /^[01]+$/.test(value);
+            if (base === 'hex') return /^[0-9A-Fa-f]+$/.test(value);
+            return false;
+        }
+
+        // ============================================================
+        // CONVERSION FUNCTIONS
+        // ============================================================
+        
+        /**
+         * Decimal to Binary via repeated division by 2
+         */
+        function decimalToBinary(decimal) {
+            var num = parseInt(decimal, 10);
+            if (num === 0) return { result: '0', steps: ['0 in binary is 0'] };
+            
+            var steps = [];
+            var binary = '';
+            var original = num;
+            
+            steps.push('Converting ' + original + ' to binary using division by 2:');
+            
+            while (num > 0) {
+                var remainder = num % 2;
+                binary = remainder + binary;
+                steps.push(num + ' ÷ 2 = ' + Math.floor(num / 2) + ', remainder = ' + remainder);
+                num = Math.floor(num / 2);
+            }
+            
+            steps.push('Reading remainders from bottom to top: ' + binary);
+            return { result: binary, steps: steps };
+        }
+
+        /**
+         * Binary to Decimal via powers of 2
+         */
+        function binaryToDecimal(binary) {
+            var steps = [];
+            var decimal = 0;
+            var bits = binary.split('').reverse();
+            
+            steps.push('Converting ' + binary + ' to decimal using powers of 2:');
+            steps.push('Reading from right to left, each position is 2^n:');
+            
+            var terms = [];
+            for (var i = 0; i < bits.length; i++) {
+                if (bits[i] === '1') {
+                    var power = Math.pow(2, i);
+                    decimal += power;
+                    terms.push(power);
+                    steps.push('Position ' + i + ': bit is 1, so add 2^' + i + ' = ' + power);
+                }
+            }
+            
+            if (terms.length > 0) {
+                steps.push('Sum: ' + terms.join(' + ') + ' = ' + decimal);
+            } else {
+                steps.push('All bits are 0, result is 0');
+            }
+            
+            return { result: decimal.toString(), steps: steps };
+        }
+
+        /**
+         * Binary to Hex via 4-bit grouping
+         */
+        function binaryToHex(binary) {
+            var steps = [];
+            var padded = binary;
+            
+            steps.push('Converting ' + binary + ' to hexadecimal using 4-bit groups:');
+            
+            // Pad to multiple of 4
+            while (padded.length % 4 !== 0) {
+                padded = '0' + padded;
+            }
+            
+            if (padded !== binary) {
+                steps.push('Padded with leading zeros: ' + padded);
+            }
+            
+            steps.push('Converting each 4-bit group:');
+            
+            var hex = '';
+            for (var i = 0; i < padded.length; i += 4) {
+                var chunk = padded.substr(i, 4);
+                var dec = parseInt(chunk, 2);
+                var hexDigit = dec.toString(16).toUpperCase();
+                hex += hexDigit;
+                steps.push('  ' + chunk + ' = ' + dec + ' = ' + hexDigit);
+            }
+            
+            steps.push('Result: ' + hex);
+            return { result: hex, steps: steps };
+        }
+
+        /**
+         * Hex to Binary - each digit to 4 bits
+         */
+        function hexToBinary(hex) {
+            var steps = [];
+            var upper = hex.toUpperCase();
+            
+            steps.push('Converting ' + upper + ' to binary (each hex digit = 4 bits):');
+            
+            var binary = '';
+            for (var i = 0; i < upper.length; i++) {
+                var digit = upper[i];
+                var dec = parseInt(digit, 16);
+                var bits = dec.toString(2);
+                while (bits.length < 4) bits = '0' + bits;
+                binary += bits;
+                steps.push('  ' + digit + ' = ' + dec + ' = ' + bits);
+            }
+            
+            // Remove leading zeros
+            var trimmed = binary.replace(/^0+/, '') || '0';
+            if (trimmed !== binary) {
+                steps.push('Removing leading zeros: ' + trimmed);
+            }
+            
+            steps.push('Result: ' + trimmed);
+            return { result: trimmed, steps: steps };
+        }
+
+        /**
+         * Decimal to Hex via divide by 16 (shown as 4x divide by 2)
+         */
+        function decimalToHex(decimal) {
+            var num = parseInt(decimal, 10);
+            if (num === 0) return { result: '0', steps: ['0 in hexadecimal is 0'] };
+            
+            var steps = [];
+            var hex = '';
+            var original = num;
+            
+            steps.push('Converting ' + original + ' to hexadecimal using division by 16:');
+            steps.push('(Note: dividing by 16 = dividing by 2 four times)');
+            
+            while (num > 0) {
+                var remainder = num % 16;
+                var hexDigit = remainder.toString(16).toUpperCase();
+                hex = hexDigit + hex;
+                
+                // Show the divide by 2 four times concept
+                var temp = num;
+                var divSteps = [];
+                for (var d = 0; d < 4 && temp > 0; d++) {
+                    divSteps.push(temp + '÷2=' + Math.floor(temp/2));
+                    temp = Math.floor(temp / 2);
+                }
+                
+                steps.push(num + ' ÷ 16 = ' + Math.floor(num / 16) + ', remainder = ' + remainder + ' (' + hexDigit + ')');
+                num = Math.floor(num / 16);
+            }
+            
+            steps.push('Reading remainders from bottom to top: ' + hex);
+            return { result: hex, steps: steps };
+        }
+
+        /**
+         * Hex to Decimal via weighted sums (positional notation)
+         */
+        function hexToDecimal(hex) {
+            var steps = [];
+            var upper = hex.toUpperCase();
+            var digits = upper.split('').reverse();
+            var decimal = 0;
+            
+            steps.push('Converting ' + upper + ' to decimal using positional values:');
+            steps.push('Each position is multiplied by 16^position:');
+            
+            var terms = [];
+            for (var i = 0; i < digits.length; i++) {
+                var digitValue = parseInt(digits[i], 16);
+                var power = Math.pow(16, i);
+                var contribution = digitValue * power;
+                decimal += contribution;
+                
+                if (contribution > 0) {
+                    terms.push(contribution);
+                }
+                
+                steps.push('  Position ' + i + ': ' + digits[i] + ' × 16^' + i + ' = ' + digitValue + ' × ' + power + ' = ' + contribution);
+            }
+            
+            if (terms.length > 0) {
+                steps.push('Sum: ' + terms.reverse().join(' + ') + ' = ' + decimal);
+            }
+            
+            return { result: decimal.toString(), steps: steps };
+        }
+
+        /**
+         * Main conversion router
+         */
+        function convert(value, fromBase, toBase) {
+            if (!value || !isValidInput(value, fromBase)) {
+                return { result: '', steps: [] };
+            }
+            
+            if (fromBase === toBase) {
+                return { result: value.toUpperCase(), steps: ['Same base - no conversion needed'] };
+            }
+            
+            if (fromBase === 'decimal' && toBase === 'binary') return decimalToBinary(value);
+            if (fromBase === 'binary' && toBase === 'decimal') return binaryToDecimal(value);
+            if (fromBase === 'decimal' && toBase === 'hex') return decimalToHex(value);
+            if (fromBase === 'hex' && toBase === 'decimal') return hexToDecimal(value);
+            if (fromBase === 'binary' && toBase === 'hex') return binaryToHex(value);
+            if (fromBase === 'hex' && toBase === 'binary') return hexToBinary(value);
+            
+            return { result: '', steps: [] };
+        }
+
+        // ============================================================
+        // CONVERTER MODE
+        // ============================================================
+        function updateConverter() {
+            var inputEl = document.getElementById('inputValue');
+            var value = inputEl.value.trim();
+            var fromBase = document.getElementById('inputBase').value;
+            var toBase = document.getElementById('outputBase').value;
+            var outputSection = document.getElementById('outputSection');
+
+            // Validate and highlight invalid input
+            if (value && !isValidInput(value, fromBase)) {
+                inputEl.classList.add('invalid');
+                outputSection.innerHTML = '';
+                return;
+            }
+            inputEl.classList.remove('invalid');
+
+            // Empty input
+            if (!value) {
+                outputSection.innerHTML = '';
+                return;
+            }
+
+            // Determine output bases
+            var bases = (toBase === 'all') ? ['decimal', 'binary', 'hex'] : [toBase];
+            var labels = { decimal: 'Decimal', binary: 'Binary', hex: 'Hexadecimal' };
+            var html = '';
+
+            for (var i = 0; i < bases.length; i++) {
+                var base = bases[i];
+                if (base === fromBase) continue;
+                
+                var conversion = convert(value, fromBase, base);
+                var result = conversion.result || '—';
+                
+                html += '<div class="output-item">';
+                html += '<div class="output-label">' + labels[base] + '</div>';
+                html += '<div class="output-value">' + result + '</div>';
+                html += '</div>';
+            }
+
+            outputSection.innerHTML = html;
+        }
+
+        // ============================================================
+        // DRILL SETUP
+        // ============================================================
+        function setPreset(p) {
+            preset = p;
+            
+            // Update button states
+            document.getElementById('presetEasy').classList.remove('active');
+            document.getElementById('presetMedium').classList.remove('active');
+            document.getElementById('presetHard').classList.remove('active');
+            document.getElementById('presetCustom').classList.remove('active');
+            
+            var presetConfigs = {
+                easy: { min: 1, max: 15, btn: 'presetEasy' },
+                medium: { min: 16, max: 255, btn: 'presetMedium' },
+                hard: { min: 256, max: 4095, btn: 'presetHard' },
+                custom: { min: rangeMin, max: rangeMax, btn: 'presetCustom' }
+            };
+            
+            var config = presetConfigs[p];
+            document.getElementById(config.btn).classList.add('active');
+            
+            if (p !== 'custom') {
+                rangeMin = config.min;
+                rangeMax = config.max;
+                document.getElementById('rangeMin').value = rangeMin;
+                document.getElementById('rangeMax').value = rangeMax;
+            }
+            
+            // Enable/disable custom range inputs
+            var isCustom = (p === 'custom');
+            document.getElementById('customRangeGroup').style.opacity = isCustom ? '1' : '0.5';
+            document.getElementById('rangeMin').disabled = !isCustom;
+            document.getElementById('rangeMax').value = rangeMax;
+            }
+            
+            // Enable/disable custom range inputs
+            var isCustom = (p === 'custom');
+            document.getElementById('customRangeGroup').style.opacity = isCustom ? '1' : '0.5';
+            document.getElementById('rangeMin').disabled = !isCustom;
+            document.getElementById('rangeMax').disabled = !isCustom;
+            
+            saveSettings();
+        }
+
+        function updateCustomRange() {
+            rangeMin = parseInt(document.getElementById('rangeMin').value) || 1;
+            rangeMax = parseInt(document.getElementById('rangeMax').value) || 15;
+            if (rangeMin < 0) rangeMin = 0;
+            if (rangeMax < rangeMin) rangeMax = rangeMin;
+            saveSettings();
+        }
+
+        function toggleTimeLimit() {
+            var enabled = document.getElementById('timeLimitEnabled').checked;
+            document.getElementById('timeLimitGroup').classList.toggle('hidden', !enabled);
+            saveSettings();
+        }
+
+        // ============================================================
+        // DRILL LOGIC
+        // ============================================================
+        function generateQuestion() {
+            var conversionTypes = [
+                { from: 'decimal', to: 'binary', id: 'dec-to-bin' },
+                { from: 'binary', to: 'decimal', id: 'bin-to-dec' },
+                { from: 'decimal', to: 'hex', id: 'dec-to-hex' },
+                { from: 'hex', to: 'decimal', id: 'hex-to-dec' },
+                { from: 'binary', to: 'hex', id: 'bin-to-hex' },
+                { from: 'hex', to: 'binary', id: 'hex-to-bin' }
+            ];
+
+            var selectedType = document.getElementById('conversionType').value;
+            var type;
+            
+            if (selectedType === 'random') {
+                type = conversionTypes[Math.floor(Math.random() * conversionTypes.length)];
+            } else {
+                for (var i = 0; i < conversionTypes.length; i++) {
+                    if (conversionTypes[i].id === selectedType) {
+                        type = conversionTypes[i];
+                        break;
+                    }
+                }
+            }
+
+            // Generate random decimal in range
+            var decimal = Math.floor(Math.random() * (rangeMax - rangeMin + 1)) + rangeMin;
+            
+            // Convert to question value in source base
+            var questionValue;
+            if (type.from === 'decimal') {
+                questionValue = decimal.toString();
+            } else if (type.from === 'binary') {
+                questionValue = decimalToBinary(decimal).result;
+            } else {
+                questionValue = decimalToHex(decimal).result;
+            }
+
+            // Get correct answer
+            var conversion = convert(questionValue, type.from, type.to);
+
+            return {
+                value: questionValue,
+                fromBase: type.from,
+                toBase: type.to,
+                correctAnswer: conversion.result,
+                steps: conversion.steps
+            };
+        }
+
+        function startDrill() {
+            // Read settings
+            rangeMin = parseInt(document.getElementById('rangeMin').value) || 1;
+            rangeMax = parseInt(document.getElementById('rangeMax').value) || 15;
+            var questionCount = parseInt(document.getElementById('questionCount').value) || 10;
+            
+            if (rangeMin < 0) rangeMin = 0;
+            if (rangeMax < rangeMin) rangeMax = rangeMin;
+            if (questionCount < 1) questionCount = 1;
+            if (questionCount > 100) questionCount = 100;
+
+            // Generate questions
+            questions = [];
+            for (var i = 0; i < questionCount; i++) {
+                questions.push(generateQuestion());
+            }
+
+            // Reset state
+            currentIndex = 0;
+            answers = [];
+            drillStartTime = Date.now();
+
+            // Show question view
+            document.getElementById('drillSetup').classList.add('hidden');
+            document.getElementById('drillQuestion').classList.remove('hidden');
+            document.getElementById('drillSummary').classList.add('hidden');
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            var q = questions[currentIndex];
+            var baseLabels = { decimal: 'Decimal', binary: 'Binary', hex: 'Hexadecimal' };
+
+            // Update UI
+            document.getElementById('questionProgress').textContent = 'Question ' + (currentIndex + 1) + ' of ' + questions.length;
+            document.getElementById('questionText').textContent = 'Convert to ' + baseLabels[q.toBase] + ':';
+            document.getElementById('questionValue').textContent = q.value;
+            
+            // Reset answer input
+            document.getElementById('answerInput').value = '';
+            document.getElementById('answerInput').focus();
+            
+            // Set appropriate keyboard
+            if (q.toBase === 'decimal') {
+                document.getElementById('answerInput').setAttribute('inputmode', 'numeric');
+            } else {
+                document.getElementById('answerInput').setAttribute('inputmode', 'text');
+            }
+            
+            // Show submit, hide feedback
+            document.getElementById('feedbackSection').classList.add('hidden');
+            document.getElementById('submitBtn').classList.remove('hidden');
+            
+            // Reset steps toggle
+            document.getElementById('stepsContent').classList.remove('visible');
+            document.getElementById('stepsToggle').textContent = '▼';
+
+            // Start timer
+            questionStartTime = Date.now();
+            
+            if (document.getElementById('timeLimitEnabled').checked) {
+                startQuestionTimer();
+            } else {
+                document.getElementById('timer').textContent = '';
+            }
+        }
+
+        function startQuestionTimer() {
+            clearInterval(timerInterval);
+            
+            var timeLimit = parseInt(document.getElementById('timeLimit').value) || 30;
+            var remaining = timeLimit;
+            
+            document.getElementById('timer').textContent = remaining + 's';
+
+            timerInterval = setInterval(function() {
+                remaining--;
+                document.getElementById('timer').textContent = remaining + 's';
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    doSubmitAnswer(true);
+                }
+            }, 1000);
+        }
+
+        function submitAnswer() {
+            doSubmitAnswer(false);
+        }
+
+        function doSubmitAnswer(isTimeout) {
+            clearInterval(timerInterval);
+
+            var q = questions[currentIndex];
+            var userAnswer = document.getElementById('answerInput').value.trim().toUpperCase();
+            var correctAnswer = q.correctAnswer.toUpperCase();
+            var isCorrect = !isTimeout && (userAnswer === correctAnswer);
+            var timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
+
+            // Record answer
+            answers.push({
+                question: q,
+                userAnswer: isTimeout ? '(timeout)' : userAnswer,
+                isCorrect: isCorrect,
+                timeTaken: timeTaken
+            });
+
+            // Show feedback
+            var feedbackEl = document.getElementById('feedbackMessage');
+            if (isCorrect) {
+                feedbackEl.textContent = 'Correct! ✓';
+                feedbackEl.className = 'feedback correct';
+                document.getElementById('correctAnswerDisplay').textContent = '';
+            } else {
+                feedbackEl.textContent = isTimeout ? "Time's up! ✗" : 'Incorrect ✗';
+                feedbackEl.className = 'feedback incorrect';
+                document.getElementById('correctAnswerDisplay').textContent = 'Correct answer: ' + q.correctAnswer;
+            }
+
+            // Show steps
+            var stepsHtml = '';
+            for (var i = 0; i < q.steps.length; i++) {
+                stepsHtml += '<div class="step">' + q.steps[i] + '</div>';
+            }
+            document.getElementById('stepsContent').innerHTML = stepsHtml;
+
+            // Update UI
+            document.getElementById('feedbackSection').classList.remove('hidden');
+            document.getElementById('submitBtn').classList.add('hidden');
+        }
+
+        function toggleSteps() {
+            var content = document.getElementById('stepsContent');
+            var toggle = document.getElementById('stepsToggle');
+            content.classList.toggle('visible');
+            toggle.textContent = content.classList.contains('visible') ? '▲' : '▼';
+        }
+
+        function continueToNext() {
+            currentIndex++;
+            
+            if (currentIndex < questions.length) {
+                showQuestion();
+            } else {
+                showSummary();
+            }
+        }
+
+        function handleAnswerKey(e) {
+            if (e.key === 'Enter') {
+                var submitBtn = document.getElementById('submitBtn');
+                if (!submitBtn.classList.contains('hidden')) {
+                    submitAnswer();
+                } else {
+                    continueToNext();
+                }
+            }
+        }
+
+        function formatTime(seconds) {
+            if (seconds < 60) return seconds + 's';
+            var mins = Math.floor(seconds / 60);
+            var secs = seconds % 60;
+            return mins + 'm ' + secs + 's';
+        }
+
+        function showSummary() {
+            var totalTime = Math.floor((Date.now() - drillStartTime) / 1000);
+            var correctCount = 0;
+            
+            for (var i = 0; i < answers.length; i++) {
+                if (answers[i].isCorrect) correctCount++;
+            }
+            
+            var accuracy = Math.round((correctCount / answers.length) * 100);
+            var avgTime = Math.floor(totalTime / answers.length);
+
+            // Update stats
+            document.getElementById('accuracyStat').textContent = accuracy + '%';
+            document.getElementById('totalTimeStat').textContent = formatTime(totalTime);
+            document.getElementById('avgTimeStat').textContent = formatTime(avgTime);
+
+            // Build question list
+            var baseLabels = { decimal: 'Dec', binary: 'Bin', hex: 'Hex' };
+            var html = '';
+
+            for (var i = 0; i < answers.length; i++) {
+                var a = answers[i];
+                var q = a.question;
+                
+                // Build steps HTML
+                var stepsHtml = '';
+                for (var j = 0; j < q.steps.length; j++) {
+                    stepsHtml += '<div class="step">' + q.steps[j] + '</div>';
+                }
+
+                html += '<div class="question-item ' + (a.isCorrect ? 'correct' : 'incorrect') + '">';
+                html += '<div class="question-detail">';
+                html += '<span>' + baseLabels[q.fromBase] + ' → ' + baseLabels[q.toBase] + ': ' + q.value + '</span>';
+                html += '<span>' + formatTime(a.timeTaken) + '</span>';
+                html += '</div>';
+                html += '<div class="question-detail">';
+                html += '<span>Your answer: ' + a.userAnswer + '</span>';
+                html += '<span>Correct: ' + q.correctAnswer + '</span>';
+                html += '</div>';
+                html += '<button type="button" class="toggle-steps-btn" onclick="toggleSummarySteps(' + i + ')">Show Steps</button>';
+                html += '<div class="steps-content" id="summarySteps' + i + '">' + stepsHtml + '</div>';
+                html += '</div>';
+            }
+
+            document.getElementById('questionList').innerHTML = html;
+
+            // Show summary view
+            document.getElementById('drillQuestion').classList.add('hidden');
+            document.getElementById('drillSummary').classList.remove('hidden');
+        }
+
+        function toggleSummarySteps(index) {
+            var el = document.getElementById('summarySteps' + index);
+            el.classList.toggle('visible');
+        }
+
+        function resetDrill() {
+            clearInterval(timerInterval);
+            document.getElementById('drillSummary').classList.add('hidden');
+            document.getElementById('drillSetup').classList.remove('hidden');
+        }
+
+        // ============================================================
+        // PERSISTENCE (localStorage)
+        // ============================================================
+        function saveSettings() {
+            try {
+                var data = {
+                    theme: theme,
+                    preset: preset,
+                    rangeMin: rangeMin,
+                    rangeMax: rangeMax,
+                    conversionType: document.getElementById('conversionType').value,
+                    questionCount: document.getElementById('questionCount').value,
+                    timeLimitEnabled: document.getElementById('timeLimitEnabled').checked,
+                    timeLimit: document.getElementById('timeLimit').value
+                };
+                localStorage.setItem('cabsLearner', JSON.stringify(data));
+            } catch (e) {
+                // localStorage not available
+            }
+        }
+
+        function loadSettings() {
+            try {
+                var saved = localStorage.getItem('cabsLearner');
+                if (!saved) return;
+                
+                var data = JSON.parse(saved);
+                
+                // Theme
+                if (data.theme === 'light') {
+                    theme = 'light';
+                    document.body.classList.add('light-mode');
+                    document.getElementById('themeBtn').textContent = '☀️';
+                }
+                
+                // Preset
+                if (data.preset) {
+                    preset = data.preset;
+                    if (data.rangeMin) rangeMin = data.rangeMin;
+                    if (data.rangeMax) rangeMax = data.rangeMax;
+                    setPreset(preset);
+                }
+                
+                // Other settings
+                if (data.conversionType) {
+                    document.getElementById('conversionType').value = data.conversionType;
+                }
+                if (data.questionCount) {
+                    document.getElementById('questionCount').value = data.questionCount;
+                }
+                if (data.timeLimitEnabled) {
+                    document.getElementById('timeLimitEnabled').checked = true;
+                    document.getElementById('timeLimitGroup').classList.remove('hidden');
+                }
+                if (data.timeLimit) {
+                    document.getElementById('timeLimit').value = data.timeLimit;
+                }
+            } catch (e) {
+                // localStorage not available or corrupted data
+            }
+        }
+
+        // ============================================================
+        // INITIALIZATION
+        // ============================================================
+        loadSettings();
+    </script>
+</body>
+</html>
