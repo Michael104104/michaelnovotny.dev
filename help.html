@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        .test-box {
+            background: #333;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .success { border: 3px solid #4caf50; }
+        .fail { border: 3px solid #f44336; }
+        button {
+            background: #4a9eff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            margin: 10px 5px;
+        }
+        #log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            font-family: monospace;
+            min-height: 100px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>JavaScript Diagnostic Test</h1>
+    
+    <div class="test-box" id="test1">
+        <strong>Test 1: Inline Script Execution</strong>
+        <p id="result1">❌ FAILED - JavaScript not running</p>
+    </div>
+    
+    <div class="test-box" id="test2">
+        <strong>Test 2: DOMContentLoaded</strong>
+        <p id="result2">❌ WAITING...</p>
+    </div>
+    
+    <div class="test-box" id="test3">
+        <strong>Test 3: Button Click</strong>
+        <p>Tap this button:</p>
+        <button id="testBtn">TAP ME</button>
+        <p id="result3">❌ Not clicked yet</p>
+    </div>
+    
+    <div class="test-box" id="test4">
+        <strong>Test 4: onclick attribute</strong>
+        <button onclick="document.getElementById('result4').textContent='✅ onclick works!'; document.getElementById('test4').classList.add('success');">TAP ME (onclick)</button>
+        <p id="result4">❌ Not clicked yet</p>
+    </div>
+
+    <div id="log">Log output will appear here...</div>
+
+    <!-- Inline script that runs immediately -->
+    <script>
+        // This should run immediately when parsed
+        document.getElementById('result1').textContent = '✅ SUCCESS - Inline JS works!';
+        document.getElementById('test1').classList.add('success');
+        
+        var logEl = document.getElementById('log');
+        logEl.innerHTML = 'Script started at: ' + new Date().toLocaleTimeString() + '<br>';
+        
+        function addLog(msg) {
+            logEl.innerHTML += msg + '<br>';
+        }
+        
+        addLog('Test 1 passed: inline script executed');
+        
+        // DOMContentLoaded test
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('result2').textContent = '✅ SUCCESS - DOMContentLoaded fired!';
+            document.getElementById('test2').classList.add('success');
+            addLog('Test 2 passed: DOMContentLoaded');
+            
+            // Button click test
+            var btn = document.getElementById('testBtn');
+            btn.onclick = function() {
+                document.getElementById('result3').textContent = '✅ SUCCESS - Button click works!';
+                document.getElementById('test3').classList.add('success');
+                addLog('Test 3 passed: button onclick');
+            };
+            
+            addLog('All listeners attached');
+        });
+        
+        addLog('Script finished parsing');
+    </script>
+    
+    <!-- Also try noscript to see if JS is disabled -->
+    <noscript>
+        <div style="background: red; color: white; padding: 20px; margin: 20px 0;">
+            ⚠️ JAVASCRIPT IS DISABLED IN YOUR BROWSER ⚠️
+        </div>
+    </noscript>
+</body>
+</html>
