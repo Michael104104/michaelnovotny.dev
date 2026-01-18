@@ -2,32 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mango Mustard 67 CRAZY Converter 🥭🔥😈</title>
 <style>
-    body {
+    html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* no scrolling */
+        width: 100vw;
+        height: 100vh;
         font-family: 'Comic Sans MS', sans-serif;
+        background: #111;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
-        min-height: 100vh;
-        background: #111;
+        justify-content: center;
         color: #fff;
-        padding: 20px;
-        animation: bgPulse 10s infinite alternate;
-    }
-    @keyframes bgPulse {
-        0% { background-color: #111; }
-        25% { background-color: #222; }
-        50% { background-color: #333; }
-        75% { background-color: #444; }
-        100% { background-color: #555; }
     }
     h1 {
-        margin-bottom: 20px;
+        font-size: 2em;
+        text-align: center;
+        margin: 0 0 20px 0;
         color: #FF00FF;
-        font-size: 2.5em;
         text-shadow: 2px 2px #00FFFF, -2px -2px #FFFF00;
         animation: titlePulse 2s infinite alternate;
     }
@@ -40,12 +36,14 @@
         display: flex;
         flex-direction: column;
         gap: 15px;
-        width: 400px;
-        border: 4px dashed #FF4500;
+        width: 90vw;
+        max-width: 400px;
         padding: 20px;
         border-radius: 25px;
         background: #222;
+        border: 4px dashed #FF4500;
         animation: borderPulse 3s infinite alternate;
+        flex-shrink: 0;
     }
     @keyframes borderPulse {
         0% { border-color: #FF4500; }
@@ -57,7 +55,7 @@
         flex-direction: column;
         font-weight: bold;
         color: #FFA500;
-        font-size: 1.1em;
+        font-size: 1em;
     }
     input {
         padding: 12px;
