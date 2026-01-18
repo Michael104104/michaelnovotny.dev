@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mango Mustard 67 CRAZY Converter 🥭🔥😈</title>
+<style>
+    body {
+        font-family: 'Comic Sans MS', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+        background: #111;
+        color: #fff;
+        padding: 20px;
+        animation: bgPulse 10s infinite alternate;
+    }
+    @keyframes bgPulse {
+        0% { background-color: #111; }
+        25% { background-color: #222; }
+        50% { background-color: #333; }
+        75% { background-color: #444; }
+        100% { background-color: #555; }
+    }
+    h1 {
+        margin-bottom: 20px;
+        color: #FF00FF;
+        font-size: 2.5em;
+        text-shadow: 2px 2px #00FFFF, -2px -2px #FFFF00;
+        animation: titlePulse 2s infinite alternate;
+    }
+    @keyframes titlePulse {
+        0% { color: #FF00FF; }
+        50% { color: #00FFFF; }
+        100% { color: #FFFF00; }
+    }
+    .converter {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 400px;
+        border: 4px dashed #FF4500;
+        padding: 20px;
+        border-radius: 25px;
+        background: #222;
+        animation: borderPulse 3s infinite alternate;
+    }
+    @keyframes borderPulse {
+        0% { border-color: #FF4500; }
+        50% { border-color: #00FF00; }
+        100% { border-color: #FFD700; }
+    }
+    label {
+        display: flex;
+        flex-direction: column;
+        font-weight: bold;
+        color: #FFA500;
+        font-size: 1.1em;
+    }
+    input {
+        padding: 12px;
+        font-size: 1.2em;
+        border-radius: 12px;
+        border: 3px solid #FFD700;
+        outline: none;
+        width: 100%;
+        box-sizing: border-box;
+        background: #111;
+        color: #00FF00;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    input:focus {
+        border: 3px solid #FF1493;
+        color: #FF00FF;
+        background: #222;
+    }
+</style>
+</head>
+<body>
+<h1>Mango Mustard 67 CRAZY Converter 🥭🔥💀</h1>
+<div class="converter">
+    <label>
+        Decimal 67 Mango 🥭:
+        <input type="text" id="decInput" placeholder="Decimal 67 Mustard">
+    </label>
+    <label>
+        Hexadecimal Mustard 🥭💀:
+        <input type="text" id="hexInput" placeholder="Hex Mustard 67">
+    </label>
+    <label>
+        Binary Mango 67 😈:
+        <input type="text" id="binInput" placeholder="Binary Mango Mustard">
+    </label>
+</div>
+
+<script>
+const decInput = document.getElementById('decInput');
+const hexInput = document.getElementById('hexInput');
+const binInput = document.getElementById('binInput');
+
+const chaosWords = ["🥭","🔥","💀","😈","💯","Mustard","67","🥱","🥵"];
+
+function randomChaos(n=3) {
+    let result = "";
+    for(let i=0; i<n; i++) {
+        result += chaosWords[Math.floor(Math.random()*chaosWords.length)];
+    }
+    return result;
+}
+
+function isValidDecimal(value) {
+    return /^-?\d+$/.test(value);
+}
+
+function isValidHex(value) {
+    return /^[0-9a-fA-F]+$/.test(value);
+}
+
+function isValidBinary(value) {
+    return /^[01]+$/.test(value);
+}
+
+function updateFromDecimal() {
+    const value = decInput.value.trim();
+    if (isValidDecimal(value)) {
+        const num = parseInt(value, 10);
+        hexInput.value = num.toString(16).toUpperCase() + " " + randomChaos(4);
+        binInput.value = num.toString(2) + " " + randomChaos(4);
+    } else if (value === "") {
+        hexInput.value = "";
+        binInput.value = "";
+    }
+}
+
+function updateFromHex() {
+    const value = hexInput.value.replace(/[^0-9a-fA-F]/g, '').trim();
+    if (isValidHex(value)) {
+        const num = parseInt(value, 16);
+        decInput.value = num.toString(10) + " " + randomChaos(4);
+        binInput.value = num.toString(2) + " " + randomChaos(4);
+    } else if (value === "") {
+        decInput.value = "";
+        binInput.value = "";
+    }
+}
+
+function updateFromBinary() {
+    const value = binInput.value.replace(/[^01]/g, '').trim();
+    if (isValidBinary(value)) {
+        const num = parseInt(value, 2);
+        decInput.value = num.toString(10) + " " + randomChaos(4);
+        hexInput.value = num.toString(16).toUpperCase() + " " + randomChaos(4);
+    } else if (value === "") {
+        decInput.value = "";
+        hexInput.value = "";
+    }
+}
+
+decInput.addEventListener('input', updateFromDecimal);
+hexInput.addEventListener('input', updateFromHex);
+binInput.addEventListener('input', updateFromBinary);
+</script>
+</body>
+</html>
