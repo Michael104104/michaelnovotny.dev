@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mango Mustard 67 Number Converter 🥭🔥😎</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+        background: #2c2c2c;
+        color: #FFD700;
+        padding: 20px;
+    }
+    h1 {
+        margin-bottom: 20px;
+        color: #FF4500;
+        text-shadow: 2px 2px #00FF00;
+    }
+    .converter {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 350px;
+        border: 3px dashed #FF69B4;
+        padding: 20px;
+        border-radius: 20px;
+        background: #333333;
+    }
+    label {
+        display: flex;
+        flex-direction: column;
+        font-weight: bold;
+        color: #FFA500;
+    }
+    input {
+        padding: 10px;
+        font-size: 1.1em;
+        border-radius: 10px;
+        border: 2px solid #FFD700;
+        outline: none;
+        width: 100%;
+        box-sizing: border-box;
+        background: #111111;
+        color: #00FF00;
+        font-weight: bold;
+    }
+    input:focus {
+        border: 2px solid #FF1493;
+    }
+</style>
+</head>
+<body>
+<h1>Mango Mustard 67 Converter 🥭🔥💯😎</h1>
+<div class="converter">
+    <label>
+        Decimal 67 Mango 🥭:
+        <input type="text" id="decInput" placeholder="Decimal 67 Mustard">
+    </label>
+    <label>
+        Hexadecimal Mustard 🥭💀:
+        <input type="text" id="hexInput" placeholder="Hex Mustard 67">
+    </label>
+    <label>
+        Binary Mango 67 😈:
+        <input type="text" id="binInput" placeholder="Binary Mango Mustard">
+    </label>
+</div>
+
+<script>
+const decInput = document.getElementById('decInput');
+const hexInput = document.getElementById('hexInput');
+const binInput = document.getElementById('binInput');
+
+function isValidDecimal(value) {
+    return /^-?\d+$/.test(value);
+}
+
+function isValidHex(value) {
+    return /^[0-9a-fA-F]+$/.test(value);
+}
+
+function isValidBinary(value) {
+    return /^[01]+$/.test(value);
+}
+
+function updateFromDecimal() {
+    const value = decInput.value.trim();
+    if (isValidDecimal(value)) {
+        const num = parseInt(value, 10);
+        hexInput.value = num.toString(16).toUpperCase() + " 🥭67";
+        binInput.value = num.toString(2) + " Mustard";
+    } else if (value === "") {
+        hexInput.value = "";
+        binInput.value = "";
+    }
+}
+
+function updateFromHex() {
+    const value = hexInput.value.replace(/[^0-9a-fA-F]/g, '').trim();
+    if (isValidHex(value)) {
+        const num = parseInt(value, 16);
+        decInput.value = num.toString(10) + " 🥭";
+        binInput.value = num.toString(2) + " Mustard67";
+    } else if (value === "") {
+        decInput.value = "";
+        binInput.value = "";
+    }
+}
+
+function updateFromBinary() {
+    const value = binInput.value.replace(/[^01]/g, '').trim();
+    if (isValidBinary(value)) {
+        const num = parseInt(value, 2);
+        decInput.value = num.toString(10) + " Mustard🥭";
+        hexInput.value = num.toString(16).toUpperCase() + " 67";
+    } else if (value === "") {
+        decInput.value = "";
+        hexInput.value = "";
+    }
+}
+
+decInput.addEventListener('input', updateFromDecimal);
+hexInput.addEventListener('input', updateFromHex);
+binInput.addEventListener('input', updateFromBinary);
+</script>
+</body>
+</html>
