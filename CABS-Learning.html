@@ -2,450 +2,572 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CABS Learner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>CABS Learner - Number System Converter & Drill</title>
     <style>
-        /* ========== RESET & BASE ========== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1a1a1a;
-            color: #e0e0e0;
-            line-height: 1.6;
-            min-height: 100vh;
-            transition: background 0.3s, color 0.3s;
-        }
-        
-        /* ========== LIGHT MODE ========== */
-        body.light-mode { background: #ffffff; color: #1a1a1a; }
-        body.light-mode header { background: #f5f5f5; border-color: #ccc; }
-        body.light-mode .nav-tab { background: #f5f5f5; border-color: #ccc; color: #1a1a1a; }
-        body.light-mode .nav-tab.active { background: #2196f3; color: white; border-color: #2196f3; }
-        body.light-mode .section { background: #f5f5f5; }
-        body.light-mode .icon-btn { background: #e0e0e0; border-color: #ccc; color: #1a1a1a; }
-        body.light-mode input, body.light-mode select { background: #fff; border-color: #ccc; color: #1a1a1a; }
-        body.light-mode .preset-btn { background: #e0e0e0; border-color: #ccc; color: #1a1a1a; }
-        body.light-mode .preset-btn.active { background: #2196f3; color: white; border-color: #2196f3; }
-        body.light-mode .output-item { background: #e0e0e0; border-color: #ccc; }
-        body.light-mode .question-prompt { background: #e0e0e0; }
-        body.light-mode .steps-section { background: #e0e0e0; border-color: #ccc; }
-        body.light-mode .stat-card { background: #e0e0e0; }
-        body.light-mode .question-item { background: #e0e0e0; }
-        body.light-mode .toggle-steps-btn { background: #fff; border-color: #ccc; color: #1a1a1a; }
-        body.light-mode .modal-content { background: #f5f5f5; }
-        body.light-mode .close-btn { background: #e0e0e0; border-color: #ccc; color: #1a1a1a; }
-        body.light-mode label { color: #666; }
-        body.light-mode .output-label { color: #666; }
-        body.light-mode .question-number { color: #666; }
-        body.light-mode .stat-label { color: #666; }
-        body.light-mode .tutorial-section p { color: #666; }
-
-        /* ========== HEADER ========== */
-        header {
-            background: #2d2d2d;
-            padding: 1rem;
-            border-bottom: 2px solid #4a4a4a;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        /* ============================================
+           CSS VARIABLES & THEME SYSTEM
+           ============================================ */
+        :root {
+            /* Dark theme (default) */
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-tertiary: #0f3460;
+            --bg-input: #1a1a2e;
+            --text-primary: #eaeaea;
+            --text-secondary: #a0a0a0;
+            --text-muted: #6a6a6a;
+            --accent: #e94560;
+            --accent-hover: #ff6b6b;
+            --success: #00d26a;
+            --error: #ff4757;
+            --warning: #ffa502;
+            --border: #2a2a4a;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --transition-speed: 0.3s;
         }
 
-        .header-content {
-            max-width: 800px;
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8e8e8;
+            --bg-input: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a4a;
+            --text-muted: #8a8a8a;
+            --accent: #e94560;
+            --accent-hover: #d63050;
+            --success: #00a854;
+            --error: #d63031;
+            --warning: #e67e22;
+            --border: #d0d0d0;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        /* ============================================
+           BASE STYLES & RESET
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           LAYOUT CONTAINERS
+           ============================================ */
+        .app-container {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            max-width: 480px;
             margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
         }
 
-        h1 { font-size: 1.5rem; color: #4a9eff; }
-
-        .header-buttons { display: flex; gap: 0.5rem; }
-
-        .icon-btn {
-            background: #3a3a3a;
-            border: 1px solid #4a4a4a;
-            color: #e0e0e0;
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
         }
 
-        .icon-btn:active { transform: scale(0.95); }
-
-        /* ========== NAVIGATION ========== */
-        .nav-tabs {
+        .header-buttons {
             display: flex;
-            max-width: 800px;
-            margin: 1rem auto;
-            padding: 0 1rem;
             gap: 0.5rem;
         }
 
-        .nav-tab {
-            flex: 1;
-            padding: 1rem;
-            background: #2d2d2d;
-            border: 2px solid #4a4a4a;
-            border-radius: 8px;
-            color: #e0e0e0;
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.25rem;
             font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .nav-tab.active {
-            background: #4a9eff;
-            color: white;
-            border-color: #4a9eff;
-        }
-
-        .nav-tab:active { transform: scale(0.98); }
-
-        /* ========== CONTAINER ========== */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-
-        .view { display: none; }
-        .view.active { display: block; }
-
-        .section {
-            background: #2d2d2d;
-            padding: 1.5rem;
+            font-weight: 600;
+            border: none;
             border-radius: 12px;
-            margin-bottom: 1rem;
-        }
-
-        /* ========== FORMS ========== */
-        .input-group { margin-bottom: 1.5rem; }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #a0a0a0;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 0.75rem;
-            min-height: 48px;
-            background: #3a3a3a;
-            border: 2px solid #4a4a4a;
-            border-radius: 8px;
-            color: #e0e0e0;
-            font-size: 1rem;
-            font-family: 'Courier New', monospace;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            padding-right: 36px;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #4a9eff;
-        }
-
-        input.invalid {
-            border-color: #f44336;
-            background: rgba(244, 67, 54, 0.1);
-        }
-
-        /* ========== CONVERTER OUTPUT ========== */
-        .output-section { margin-top: 1rem; }
-
-        .output-item {
-            background: #3a3a3a;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.75rem;
-            border: 2px solid #4a4a4a;
-        }
-
-        .output-label {
-            color: #a0a0a0;
-            font-size: 0.85rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .output-value {
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            color: #4a9eff;
-            word-break: break-all;
-        }
-
-        /* ========== DRILL SETUP ========== */
-        .preset-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .preset-btn {
-            padding: 1rem;
-            min-height: 48px;
-            background: #3a3a3a;
-            border: 2px solid #4a4a4a;
-            border-radius: 8px;
-            color: #e0e0e0;
-            font-size: 1rem;
-            font-weight: 500;
             cursor: pointer;
+            transition: all var(--transition-speed);
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            min-height: 48px;
+            touch-action: manipulation;
         }
 
-        .preset-btn.active {
-            background: #4a9eff;
-            color: white;
-            border-color: #4a9eff;
-        }
-
-        .preset-btn:active { transform: scale(0.98); }
-
-        .range-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
+        .btn:active {
+            transform: scale(0.96);
         }
 
         .btn-primary {
-            width: 100%;
-            padding: 1rem;
-            min-height: 52px;
-            background: #4a9eff;
+            background-color: var(--accent);
             color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1rem;
         }
 
         .btn-primary:active {
-            transform: scale(0.98);
-            background: #357abd;
+            background-color: var(--accent-hover);
         }
 
-        .checkbox-group {
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+        }
+
+        .btn-large {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            border-radius: 16px;
+        }
+
+        /* ============================================
+           MODE TABS
+           ============================================ */
+        .mode-tabs {
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-            min-height: 44px;
-        }
-
-        .checkbox-group label { margin-bottom: 0; flex: 1; }
-
-        input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            cursor: pointer;
-            accent-color: #4a9eff;
-        }
-
-        /* ========== DRILL QUESTION ========== */
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #4a4a4a;
-        }
-
-        .question-number { color: #a0a0a0; font-size: 0.9rem; }
-        .timer { color: #4a9eff; font-family: 'Courier New', monospace; font-size: 1rem; font-weight: bold; }
-
-        .question-prompt {
-            background: #3a3a3a;
-            padding: 1.5rem;
-            border-radius: 8px;
-            text-align: center;
+            gap: 0.5rem;
             margin-bottom: 1.5rem;
         }
 
-        .question-value {
-            font-family: 'Courier New', monospace;
-            font-size: 2rem;
-            color: #4a9eff;
-            margin: 0.5rem 0;
-            word-break: break-all;
-        }
-
-        .feedback {
+        .mode-tab {
+            flex: 1;
             padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
+            font-size: 1rem;
             font-weight: 600;
-            font-size: 1.1rem;
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            color: var(--text-secondary);
+        }
+
+        .mode-tab.active {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* ============================================
+           CARDS & SECTIONS
+           ============================================ */
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        /* ============================================
+           INPUT STYLES
+           ============================================ */
+        .input-group {
             margin-bottom: 1rem;
         }
 
-        .feedback.correct {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-            border: 2px solid #4caf50;
+        .input-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
         }
 
-        .feedback.incorrect {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 2px solid #f44336;
+        .input-field {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            font-size: 1.125rem;
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            background-color: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            transition: border-color var(--transition-speed);
+            min-height: 52px;
         }
 
-        .correct-answer {
-            text-align: center;
-            margin-bottom: 1rem;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
         }
 
-        .steps-section {
-            background: #3a3a3a;
+        .input-field.has-error {
+            border-color: var(--error);
+        }
+
+        /* Monospace display for conversions */
+        .mono-display {
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 1.25rem;
             padding: 1rem;
+            background-color: var(--bg-tertiary);
             border-radius: 8px;
-            margin: 1rem 0;
-            border: 2px solid #4a4a4a;
+            word-break: break-all;
+            letter-spacing: 1px;
         }
 
-        .steps-header {
+        /* Invalid character highlighting */
+        .char-valid {
+            color: var(--text-primary);
+        }
+
+        .char-invalid {
+            color: var(--error);
+            background-color: rgba(255, 71, 87, 0.2);
+            border-radius: 2px;
+            padding: 0 2px;
+        }
+
+        /* ============================================
+           BASE SELECTOR
+           ============================================ */
+        .base-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .base-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 0.75rem 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background-color: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            color: var(--text-secondary);
+        }
+
+        .base-btn.active {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .base-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ============================================
+           OUTPUT DISPLAY
+           ============================================ */
+        .output-section {
+            margin-top: 1rem;
+        }
+
+        .output-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
-            min-height: 44px;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .output-row:last-child {
+            border-bottom: none;
+        }
+
+        .output-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
             font-weight: 500;
+        }
+
+        .output-value {
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 1rem;
+            color: var(--text-primary);
+            text-align: right;
+            word-break: break-all;
+            max-width: 60%;
+        }
+
+        /* ============================================
+           DRILL MODE STYLES
+           ============================================ */
+        .drill-setup {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .preset-btn {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            background-color: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            color: var(--text-primary);
+        }
+
+        .preset-btn.active {
+            border-color: var(--accent);
+            background-color: rgba(233, 69, 96, 0.1);
+        }
+
+        .range-inputs {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .range-inputs .input-field {
+            flex: 1;
+        }
+
+        .range-separator {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Question display */
+        .question-container {
+            text-align: center;
+            padding: 1.5rem 0;
+        }
+
+        .question-progress {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .question-timer {
+            font-size: 1rem;
+            color: var(--warning);
+            margin-bottom: 1rem;
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+        }
+
+        .question-prompt {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .question-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .question-target {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Answer feedback */
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .feedback.correct {
+            background-color: rgba(0, 210, 106, 0.15);
+            color: var(--success);
+        }
+
+        .feedback.incorrect {
+            background-color: rgba(255, 71, 87, 0.15);
+            color: var(--error);
+        }
+
+        .correct-answer {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .correct-answer span {
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            color: var(--text-primary);
+        }
+
+        /* Steps display */
+        .steps-toggle {
+            margin-top: 1rem;
+            text-align: center;
         }
 
         .steps-content {
             margin-top: 1rem;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.8;
-            display: none;
-            padding-top: 1rem;
-            border-top: 1px solid #4a4a4a;
+            padding: 1rem;
+            background-color: var(--bg-tertiary);
+            border-radius: 12px;
+            text-align: left;
+            font-size: 0.875rem;
+            line-height: 1.6;
         }
 
-        .steps-content.visible { display: block; }
-
-        .step {
-            margin-bottom: 0.5rem;
-            padding-left: 1rem;
+        .step-line {
+            padding: 0.25rem 0;
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            color: var(--text-secondary);
         }
 
-        /* ========== DRILL SUMMARY ========== */
+        .step-highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Summary screen */
         .summary-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
+            gap: 0.5rem;
             margin-bottom: 1.5rem;
         }
 
-        .stat-card {
-            background: #3a3a3a;
-            padding: 1rem;
-            border-radius: 8px;
+        .stat-box {
             text-align: center;
+            padding: 1rem 0.5rem;
+            background-color: var(--bg-tertiary);
+            border-radius: 10px;
         }
 
         .stat-value {
-            font-size: 1.8rem;
-            color: #4a9eff;
+            font-size: 1.5rem;
             font-weight: 700;
+            color: var(--accent);
         }
 
         .stat-label {
-            color: #a0a0a0;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
             margin-top: 0.25rem;
         }
 
-        .question-list { margin-top: 1.5rem; }
+        .question-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
 
         .question-item {
-            background: #3a3a3a;
-            padding: 1rem;
+            padding: 0.75rem;
+            background-color: var(--bg-tertiary);
             border-radius: 8px;
-            margin-bottom: 0.75rem;
-            border-left: 4px solid #4a4a4a;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
         }
 
-        .question-item.correct { border-left-color: #4caf50; }
-        .question-item.incorrect { border-left-color: #f44336; }
+        .question-item.correct {
+            border-left: 3px solid var(--success);
+        }
 
-        .question-detail {
+        .question-item.incorrect {
+            border-left: 3px solid var(--error);
+        }
+
+        .question-item-header {
             display: flex;
             justify-content: space-between;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+            margin-bottom: 0.25rem;
         }
 
-        .toggle-steps-btn {
-            background: #2d2d2d;
-            color: #e0e0e0;
-            border: 1px solid #4a4a4a;
-            padding: 0.5rem 1rem;
-            min-height: 40px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
+        .question-item-q {
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
         }
 
-        .toggle-steps-btn:active { transform: scale(0.98); }
+        .question-item-answers {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
 
-        /* ========== MODAL ========== */
-        .modal {
-            display: none;
+        /* ============================================
+           MODAL / OVERLAY
+           ============================================ */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 1000;
             padding: 1rem;
-            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-speed);
         }
 
-        .modal.active {
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
         .modal-content {
-            background: #2d2d2d;
-            border-radius: 12px;
+            background-color: var(--bg-secondary);
+            border-radius: 20px;
             padding: 1.5rem;
-            max-width: 600px;
+            max-width: 400px;
             width: 100%;
-            margin: 2rem 0;
-            max-height: calc(100vh - 4rem);
+            max-height: 80vh;
             overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform var(--transition-speed);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
         }
 
         .modal-header {
@@ -453,992 +575,1379 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
-            border-bottom: 2px solid #4a4a4a;
-            padding-bottom: 0.75rem;
         }
 
-        .modal-title { font-size: 1.3rem; color: #4a9eff; }
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
 
-        .close-btn {
-            background: #3a3a3a;
-            border: 1px solid #4a4a4a;
-            color: #e0e0e0;
+        .modal-close {
+            background: none;
+            border: none;
             font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .tutorial-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .tutorial-section h3 {
+            font-size: 1rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .tutorial-section p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           THEME TOGGLE
+           ============================================ */
+        .theme-toggle {
+            position: relative;
             width: 44px;
             height: 44px;
-            border-radius: 8px;
+            border-radius: 10px;
+            background-color: var(--bg-tertiary);
+            border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.25rem;
+            transition: all var(--transition-speed);
         }
 
-        .close-btn:active { transform: scale(0.95); }
+        /* ============================================
+           HIDDEN VIEWS
+           ============================================ */
+        .view {
+            display: none;
+        }
 
-        .tutorial-section { margin-bottom: 1.5rem; }
-        .tutorial-section h3 { color: #4a9eff; margin-bottom: 0.5rem; font-size: 1.1rem; }
-        .tutorial-section p { color: #a0a0a0; margin-bottom: 0.5rem; line-height: 1.5; }
-        .tutorial-section p strong { color: #e0e0e0; }
+        .view.active {
+            display: block;
+        }
 
-        /* ========== UTILITIES ========== */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .mb-1 { margin-bottom: 1rem; }
+        /* ============================================
+           CHECKBOX TOGGLE
+           ============================================ */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
 
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 480px) {
-            h1 { font-size: 1.3rem; }
-            .summary-stats { grid-template-columns: 1fr; }
-            .range-inputs { grid-template-columns: 1fr; }
-            .stat-value { font-size: 2rem; }
-            .question-value { font-size: 1.5rem; }
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background-color: var(--border);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .toggle-switch.active {
+            background-color: var(--accent);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background-color: white;
+            border-radius: 12px;
+            transition: transform var(--transition-speed);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+
+        /* ============================================
+           SELECT DROPDOWN
+           ============================================ */
+        .select-field {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            background-color: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a0a0a0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            min-height: 52px;
+        }
+
+        /* ============================================
+           UTILITY CLASSES
+           ============================================ */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+
+        /* ============================================
+           SCROLLBAR STYLING
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
         }
     </style>
 </head>
 <body>
-    <!-- ========== HEADER ========== -->
-    <header>
-        <div class="header-content">
+    <div class="app-container">
+        <!-- ============================================
+             HEADER
+             ============================================ -->
+        <header class="header">
             <h1>CABS Learner</h1>
             <div class="header-buttons">
-                <button type="button" class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
-                <button type="button" class="icon-btn" onclick="openTutorial()">❓</button>
+                <button class="btn btn-icon" id="tutorialBtn" aria-label="Tutorial">?</button>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <!-- ========== NAVIGATION ========== -->
-    <div class="nav-tabs">
-        <button type="button" class="nav-tab active" id="converterTabBtn" onclick="switchView('converter')">Converter</button>
-        <button type="button" class="nav-tab" id="drillTabBtn" onclick="switchView('drill')">Drill</button>
-    </div>
-
-    <!-- ========== MAIN CONTAINER ========== -->
-    <div class="container">
-        
-        <!-- ===== CONVERTER VIEW ===== -->
-        <div id="converterView" class="view active">
-            <div class="section">
-                <div class="input-group">
-                    <label for="inputValue">Input Value</label>
-                    <input type="text" id="inputValue" placeholder="Enter value..." oninput="updateConverter()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                </div>
-                <div class="input-group">
-                    <label for="inputBase">Input Base</label>
-                    <select id="inputBase" onchange="updateConverter()">
-                        <option value="decimal">Decimal (0-9)</option>
-                        <option value="binary">Binary (0-1)</option>
-                        <option value="hex">Hexadecimal (0-9, A-F)</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="outputBase">Output Bases</label>
-                    <select id="outputBase" onchange="updateConverter()">
-                        <option value="all">All Bases</option>
-                        <option value="decimal">Decimal</option>
-                        <option value="binary">Binary</option>
-                        <option value="hex">Hexadecimal</option>
-                    </select>
-                </div>
-                <div class="output-section" id="outputSection"></div>
-            </div>
+        <!-- ============================================
+             MODE TABS
+             ============================================ -->
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="converter">Converter</button>
+            <button class="mode-tab" data-mode="drill">Drill</button>
         </div>
 
-        <!-- ===== DRILL VIEW ===== -->
-        <div id="drillView" class="view">
-            
-            <!-- Drill Setup -->
-            <div id="drillSetup" class="section">
-                <div class="input-group">
-                    <label for="conversionType">Conversion Type</label>
-                    <select id="conversionType" onchange="saveSettings()">
-                        <option value="random">Random (All Types)</option>
-                        <option value="dec-to-bin">Decimal → Binary</option>
-                        <option value="bin-to-dec">Binary → Decimal</option>
-                        <option value="dec-to-hex">Decimal → Hexadecimal</option>
-                        <option value="hex-to-dec">Hexadecimal → Decimal</option>
-                        <option value="bin-to-hex">Binary → Hexadecimal</option>
-                        <option value="hex-to-bin">Hexadecimal → Binary</option>
-                    </select>
+        <!-- ============================================
+             CONVERTER VIEW
+             ============================================ -->
+        <div class="view active" id="converterView">
+            <div class="card">
+                <div class="card-title">Input Base</div>
+                <div class="base-selector" id="inputBaseSelector">
+                    <button class="base-btn active" data-base="10">Decimal</button>
+                    <button class="base-btn" data-base="2">Binary</button>
+                    <button class="base-btn" data-base="16">Hexadecimal</button>
                 </div>
-
-                <div class="input-group">
-                    <label>Difficulty Preset</label>
-                    <div class="preset-buttons">
-                        <button type="button" class="preset-btn active" id="presetEasy" onclick="setPreset('easy')">Easy (1-15)</button>
-                        <button type="button" class="preset-btn" id="presetMedium" onclick="setPreset('medium')">Medium (16-255)</button>
-                        <button type="button" class="preset-btn" id="presetHard" onclick="setPreset('hard')">Hard (256-4095)</button>
-                        <button type="button" class="preset-btn" id="presetCustom" onclick="setPreset('custom')">Custom</button>
-                    </div>
-                </div>
-
-                <div class="input-group" id="customRangeGroup" style="opacity: 0.5;">
-                    <label>Custom Range (Decimal Values)</label>
-                    <div class="range-inputs">
-                        <input type="number" id="rangeMin" value="1" placeholder="Min" disabled oninput="updateCustomRange()">
-                        <input type="number" id="rangeMax" value="15" placeholder="Max" disabled oninput="updateCustomRange()">
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label for="questionCount">Number of Questions</label>
-                    <input type="number" id="questionCount" value="10" min="1" max="100" inputmode="numeric" onchange="saveSettings()">
-                </div>
-
-                <div class="checkbox-group">
-                    <input type="checkbox" id="timeLimitEnabled" onchange="toggleTimeLimit()">
-                    <label for="timeLimitEnabled">Enable Time Limit</label>
-                </div>
-
-                <div class="input-group hidden" id="timeLimitGroup">
-                    <label for="timeLimit">Seconds Per Question</label>
-                    <input type="number" id="timeLimit" value="30" min="5" max="300" inputmode="numeric" onchange="saveSettings()">
-                </div>
-
-                <button type="button" class="btn-primary" onclick="startDrill()">Start Drill</button>
             </div>
 
-            <!-- Drill Question -->
-            <div id="drillQuestion" class="section hidden">
-                <div class="question-header">
-                    <span class="question-number" id="questionProgress">Question 1 of 10</span>
-                    <span class="timer" id="timer"></span>
-                </div>
+            <div class="card">
+                <div class="card-title">Enter Value</div>
+                <input type="text" 
+                       class="input-field" 
+                       id="converterInput" 
+                       placeholder="Enter number..."
+                       autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       spellcheck="false">
+                <div id="inputValidation" class="mono-display mt-2" style="display: none;"></div>
+            </div>
 
-                <div class="question-prompt">
-                    <div id="questionText">Convert to Binary:</div>
+            <div class="card">
+                <div class="card-title">Output Bases</div>
+                <div class="base-selector" id="outputBaseSelector">
+                    <button class="base-btn active" data-base="10">Decimal</button>
+                    <button class="base-btn active" data-base="2">Binary</button>
+                    <button class="base-btn active" data-base="16">Hexadecimal</button>
+                </div>
+            </div>
+
+            <div class="card" id="outputCard">
+                <div class="card-title">Results</div>
+                <div class="output-section" id="converterOutput">
+                    <p class="text-center" style="color: var(--text-muted);">Enter a value above</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================
+             DRILL VIEW - SETUP
+             ============================================ -->
+        <div class="view" id="drillSetupView">
+            <div class="card">
+                <div class="card-title">Conversion Type</div>
+                <select class="select-field" id="conversionType">
+                    <option value="random">Random (All Types)</option>
+                    <option value="dec2bin">Decimal → Binary</option>
+                    <option value="bin2dec">Binary → Decimal</option>
+                    <option value="dec2hex">Decimal → Hexadecimal</option>
+                    <option value="hex2dec">Hexadecimal → Decimal</option>
+                    <option value="bin2hex">Binary → Hexadecimal</option>
+                    <option value="hex2bin">Hexadecimal → Binary</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Difficulty Preset</div>
+                <div class="preset-grid" id="difficultyPresets">
+                    <button class="preset-btn active" data-min="0" data-max="15">Easy (0-15)</button>
+                    <button class="preset-btn" data-min="0" data-max="255">Medium (0-255)</button>
+                    <button class="preset-btn" data-min="0" data-max="4095">Hard (0-4095)</button>
+                    <button class="preset-btn" data-min="0" data-max="65535">Expert (0-65535)</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Custom Range (Decimal)</div>
+                <div class="range-inputs">
+                    <input type="number" class="input-field" id="rangeMin" value="0" min="0" inputmode="numeric">
+                    <span class="range-separator">to</span>
+                    <input type="number" class="input-field" id="rangeMax" value="15" min="0" inputmode="numeric">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Questions</div>
+                <input type="number" class="input-field" id="questionCount" value="10" min="1" max="100" inputmode="numeric">
+            </div>
+
+            <div class="card">
+                <div class="card-title">Time Limit</div>
+                <div class="toggle-row">
+                    <span>Enable time limit</span>
+                    <div class="toggle-switch" id="timeLimitToggle"></div>
+                </div>
+                <div id="timeLimitOptions" class="hidden mt-2">
+                    <input type="number" class="input-field" id="timeLimit" value="30" min="5" max="300" inputmode="numeric">
+                    <span class="input-label mt-1">Seconds per question</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-large mt-2" id="startDrillBtn">Start Drill</button>
+        </div>
+
+        <!-- ============================================
+             DRILL VIEW - QUESTION
+             ============================================ -->
+        <div class="view" id="drillQuestionView">
+            <div class="card">
+                <div class="question-container">
+                    <div class="question-progress" id="questionProgress">Question 1 of 10</div>
+                    <div class="question-timer hidden" id="questionTimer">30s</div>
+                    <div class="question-prompt" id="questionPrompt">Convert from Decimal to Binary:</div>
                     <div class="question-value" id="questionValue">42</div>
+                    <div class="question-target" id="questionTarget">Enter the Binary value</div>
                 </div>
-
-                <div class="input-group">
-                    <label for="answerInput">Your Answer</label>
-                    <input type="text" id="answerInput" placeholder="Enter your answer..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeypress="handleAnswerKey(event)">
-                </div>
-
-                <div id="feedbackSection" class="hidden">
-                    <div class="feedback" id="feedbackMessage"></div>
-                    <div class="correct-answer" id="correctAnswerDisplay"></div>
-                    
-                    <div class="steps-section">
-                        <div class="steps-header" onclick="toggleSteps()">
-                            <span>📝 Show Steps</span>
-                            <span id="stepsToggle">▼</span>
-                        </div>
-                        <div class="steps-content" id="stepsContent"></div>
-                    </div>
-
-                    <button type="button" class="btn-primary" onclick="continueToNext()">Continue (Enter)</button>
-                </div>
-
-                <button type="button" class="btn-primary" id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
             </div>
 
-            <!-- Drill Summary -->
-            <div id="drillSummary" class="section hidden">
-                <h2 class="text-center mb-1">Drill Complete! 🎉</h2>
+            <div class="card">
+                <input type="text" 
+                       class="input-field" 
+                       id="drillAnswer" 
+                       placeholder="Your answer..."
+                       autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="characters"
+                       spellcheck="false">
+                <button class="btn btn-primary btn-large mt-2" id="submitAnswerBtn">Submit</button>
+            </div>
 
+            <div id="feedbackSection" class="hidden">
+                <div class="feedback" id="feedbackMessage"></div>
+                <div class="correct-answer hidden" id="correctAnswerDisplay"></div>
+                
+                <div class="steps-toggle">
+                    <button class="btn" id="showStepsBtn">Show Steps</button>
+                </div>
+                <div class="steps-content hidden" id="stepsContent"></div>
+                
+                <button class="btn btn-success btn-large mt-2" id="continueBtn">Continue (Enter)</button>
+            </div>
+        </div>
+
+        <!-- ============================================
+             DRILL VIEW - SUMMARY
+             ============================================ -->
+        <div class="view" id="drillSummaryView">
+            <div class="card">
+                <div class="card-title">Results</div>
                 <div class="summary-stats">
-                    <div class="stat-card">
-                        <div class="stat-value" id="accuracyStat">0%</div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="summaryAccuracy">0%</div>
                         <div class="stat-label">Accuracy</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalTimeStat">0s</div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="summaryTotal">0s</div>
                         <div class="stat-label">Total Time</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="avgTimeStat">0s</div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="summaryAvg">0s</div>
                         <div class="stat-label">Avg Time</div>
                     </div>
                 </div>
-
-                <h3 class="mb-1">Questions Review</h3>
-                <div id="questionList"></div>
-
-                <button type="button" class="btn-primary" onclick="resetDrill()">Start New Drill</button>
             </div>
+
+            <div class="card">
+                <div class="card-title">Questions</div>
+                <div class="question-list" id="questionList"></div>
+            </div>
+
+            <button class="btn btn-primary btn-large mt-2" id="newDrillBtn">New Drill</button>
         </div>
     </div>
 
-    <!-- ========== TUTORIAL MODAL ========== -->
-    <div class="modal" id="tutorialModal" onclick="closeTutorialIfBackground(event)">
+    <!-- ============================================
+         TUTORIAL MODAL
+         ============================================ -->
+    <div class="modal-overlay" id="tutorialModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Tutorial</h2>
-                <button type="button" class="close-btn" onclick="closeTutorial()">×</button>
+                <button class="modal-close" id="closeTutorial">&times;</button>
             </div>
 
             <div class="tutorial-section">
-                <h3>About CABS Learner</h3>
-                <p>CABS Learner helps you master number system conversions between <strong>Decimal</strong>, <strong>Binary</strong>, and <strong>Hexadecimal</strong>.</p>
+                <h3>What is CABS Learner?</h3>
+                <p>CABS stands for "Convert All Base Systems". This app helps you practice converting numbers between Decimal (base 10), Binary (base 2), and Hexadecimal (base 16).</p>
             </div>
 
             <div class="tutorial-section">
                 <h3>Converter Mode</h3>
-                <p>Practice conversions at your own pace. Enter any number in any base and see instant conversions.</p>
-                <p><strong>Valid characters by base:</strong></p>
-                <p>• Decimal: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9</p>
-                <p>• Binary: 0, 1</p>
-                <p>• Hexadecimal: 0-9, A, B, C, D, E, F</p>
-                <p>Invalid characters are highlighted but not blocked.</p>
+                <p>Select your input base, enter a number, and see instant conversions to all selected output bases. Invalid characters are highlighted in red but don't block typing.</p>
             </div>
 
             <div class="tutorial-section">
                 <h3>Drill Mode</h3>
-                <p>Test your skills with timed practice sessions. Configure your drill:</p>
-                <p>• <strong>Conversion Type:</strong> Choose specific conversions or random</p>
-                <p>• <strong>Difficulty:</strong> Easy (1-15), Medium (16-255), Hard (256-4095), or Custom</p>
-                <p>• <strong>Time Limit:</strong> Optional countdown per question</p>
+                <p>Practice conversions with timed questions. Choose your difficulty, number of questions, and optional time limits. After each answer, view step-by-step conversion explanations.</p>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>Number Systems</h3>
+                <p><strong>Decimal (Base 10):</strong> Uses digits 0-9. This is our everyday number system.</p>
+                <p><strong>Binary (Base 2):</strong> Uses only 0 and 1. Each position represents a power of 2.</p>
+                <p><strong>Hexadecimal (Base 16):</strong> Uses 0-9 and A-F. Each hex digit equals 4 binary bits.</p>
             </div>
 
             <div class="tutorial-section">
                 <h3>Conversion Methods</h3>
-                <p><strong>Decimal → Binary:</strong> Repeatedly divide by 2, read remainders from bottom to top.</p>
-                <p><strong>Binary → Decimal:</strong> Sum powers of 2 for each 1 bit (rightmost = 2⁰).</p>
-                <p><strong>Binary → Hex:</strong> Group into 4 bits from right, convert each group (0000=0 to 1111=F).</p>
-                <p><strong>Hex → Binary:</strong> Convert each hex digit to 4 bits.</p>
-                <p><strong>Decimal → Hex:</strong> Divide by 16 repeatedly (or divide by 2 four times per digit).</p>
-                <p><strong>Hex → Decimal:</strong> Multiply each digit by 16^position and sum.</p>
+                <p><strong>Dec → Bin:</strong> Repeatedly divide by 2, collect remainders.</p>
+                <p><strong>Bin → Dec:</strong> Sum powers of 2 for each '1' bit.</p>
+                <p><strong>Dec → Hex:</strong> Divide by 16 (or 2 four times), collect remainders.</p>
+                <p><strong>Hex → Dec:</strong> Multiply each digit by its power of 16.</p>
+                <p><strong>Bin ↔ Hex:</strong> Group binary into 4-bit chunks, convert each to hex.</p>
             </div>
 
             <div class="tutorial-section">
                 <h3>Tips</h3>
-                <p>• Use <strong>Show Steps</strong> to understand the conversion process</p>
-                <p>• Start with Easy difficulty and work your way up</p>
-                <p>• Press <strong>Enter</strong> to quickly submit answers or continue</p>
-                <p>• Your settings are automatically saved</p>
+                <p>• Hex uses uppercase A-F (no 0x prefix)<br>
+                • Press Enter to submit answers or continue<br>
+                • Your progress is saved automatically<br>
+                • Toggle dark/light mode with the moon/sun button</p>
             </div>
         </div>
     </div>
 
-    <!-- ========== JAVASCRIPT ========== -->
     <script>
-        // ============================================================
-        // STATE VARIABLES
-        // ============================================================
-        var theme = 'dark';
-        var preset = 'easy';
-        var rangeMin = 1;
-        var rangeMax = 15;
-        var questions = [];
-        var currentIndex = 0;
-        var answers = [];
-        var drillStartTime = 0;
-        var questionStartTime = 0;
-        var timerInterval = null;
+        /* ============================================
+           CABS LEARNER - MAIN APPLICATION
+           ============================================ */
 
-        // ============================================================
-        // THEME FUNCTIONS
-        // ============================================================
-        function toggleTheme() {
-            theme = (theme === 'dark') ? 'light' : 'dark';
-            document.body.classList.toggle('light-mode', theme === 'light');
-            document.getElementById('themeBtn').textContent = (theme === 'dark') ? '🌙' : '☀️';
-            saveSettings();
-        }
+        (function() {
+            'use strict';
 
-        // ============================================================
-        // VIEW NAVIGATION
-        // ============================================================
-        function switchView(view) {
-            // Update tab buttons
-            document.getElementById('converterTabBtn').classList.toggle('active', view === 'converter');
-            document.getElementById('drillTabBtn').classList.toggle('active', view === 'drill');
+            // ============================================
+            // STATE MANAGEMENT
+            // ============================================
             
-            // Update views
-            document.getElementById('converterView').classList.toggle('active', view === 'converter');
-            document.getElementById('drillView').classList.toggle('active', view === 'drill');
-        }
-
-        // ============================================================
-        // TUTORIAL MODAL
-        // ============================================================
-        function openTutorial() {
-            document.getElementById('tutorialModal').classList.add('active');
-        }
-
-        function closeTutorial() {
-            document.getElementById('tutorialModal').classList.remove('active');
-        }
-
-        function closeTutorialIfBackground(e) {
-            if (e.target.id === 'tutorialModal') {
-                closeTutorial();
-            }
-        }
-
-        // ============================================================
-        // INPUT VALIDATION
-        // ============================================================
-        function isValidInput(value, base) {
-            if (!value || value.length === 0) return true;
-            if (base === 'decimal') return /^[0-9]+$/.test(value);
-            if (base === 'binary') return /^[01]+$/.test(value);
-            if (base === 'hex') return /^[0-9A-Fa-f]+$/.test(value);
-            return false;
-        }
-
-        // ============================================================
-        // CONVERSION FUNCTIONS
-        // ============================================================
-        
-        /**
-         * Decimal to Binary via repeated division by 2
-         */
-        function decimalToBinary(decimal) {
-            var num = parseInt(decimal, 10);
-            if (num === 0) return { result: '0', steps: ['0 in binary is 0'] };
-            
-            var steps = [];
-            var binary = '';
-            var original = num;
-            
-            steps.push('Converting ' + original + ' to binary using division by 2:');
-            
-            while (num > 0) {
-                var remainder = num % 2;
-                binary = remainder + binary;
-                steps.push(num + ' ÷ 2 = ' + Math.floor(num / 2) + ', remainder = ' + remainder);
-                num = Math.floor(num / 2);
-            }
-            
-            steps.push('Reading remainders from bottom to top: ' + binary);
-            return { result: binary, steps: steps };
-        }
-
-        /**
-         * Binary to Decimal via powers of 2
-         */
-        function binaryToDecimal(binary) {
-            var steps = [];
-            var decimal = 0;
-            var bits = binary.split('').reverse();
-            
-            steps.push('Converting ' + binary + ' to decimal using powers of 2:');
-            steps.push('Reading from right to left, each position is 2^n:');
-            
-            var terms = [];
-            for (var i = 0; i < bits.length; i++) {
-                if (bits[i] === '1') {
-                    var power = Math.pow(2, i);
-                    decimal += power;
-                    terms.push(power);
-                    steps.push('Position ' + i + ': bit is 1, so add 2^' + i + ' = ' + power);
-                }
-            }
-            
-            if (terms.length > 0) {
-                steps.push('Sum: ' + terms.join(' + ') + ' = ' + decimal);
-            } else {
-                steps.push('All bits are 0, result is 0');
-            }
-            
-            return { result: decimal.toString(), steps: steps };
-        }
-
-        /**
-         * Binary to Hex via 4-bit grouping
-         */
-        function binaryToHex(binary) {
-            var steps = [];
-            var padded = binary;
-            
-            steps.push('Converting ' + binary + ' to hexadecimal using 4-bit groups:');
-            
-            // Pad to multiple of 4
-            while (padded.length % 4 !== 0) {
-                padded = '0' + padded;
-            }
-            
-            if (padded !== binary) {
-                steps.push('Padded with leading zeros: ' + padded);
-            }
-            
-            steps.push('Converting each 4-bit group:');
-            
-            var hex = '';
-            for (var i = 0; i < padded.length; i += 4) {
-                var chunk = padded.substr(i, 4);
-                var dec = parseInt(chunk, 2);
-                var hexDigit = dec.toString(16).toUpperCase();
-                hex += hexDigit;
-                steps.push('  ' + chunk + ' = ' + dec + ' = ' + hexDigit);
-            }
-            
-            steps.push('Result: ' + hex);
-            return { result: hex, steps: steps };
-        }
-
-        /**
-         * Hex to Binary - each digit to 4 bits
-         */
-        function hexToBinary(hex) {
-            var steps = [];
-            var upper = hex.toUpperCase();
-            
-            steps.push('Converting ' + upper + ' to binary (each hex digit = 4 bits):');
-            
-            var binary = '';
-            for (var i = 0; i < upper.length; i++) {
-                var digit = upper[i];
-                var dec = parseInt(digit, 16);
-                var bits = dec.toString(2);
-                while (bits.length < 4) bits = '0' + bits;
-                binary += bits;
-                steps.push('  ' + digit + ' = ' + dec + ' = ' + bits);
-            }
-            
-            // Remove leading zeros
-            var trimmed = binary.replace(/^0+/, '') || '0';
-            if (trimmed !== binary) {
-                steps.push('Removing leading zeros: ' + trimmed);
-            }
-            
-            steps.push('Result: ' + trimmed);
-            return { result: trimmed, steps: steps };
-        }
-
-        /**
-         * Decimal to Hex via divide by 16 (shown as 4x divide by 2)
-         */
-        function decimalToHex(decimal) {
-            var num = parseInt(decimal, 10);
-            if (num === 0) return { result: '0', steps: ['0 in hexadecimal is 0'] };
-            
-            var steps = [];
-            var hex = '';
-            var original = num;
-            
-            steps.push('Converting ' + original + ' to hexadecimal using division by 16:');
-            steps.push('(Note: dividing by 16 = dividing by 2 four times)');
-            
-            while (num > 0) {
-                var remainder = num % 16;
-                var hexDigit = remainder.toString(16).toUpperCase();
-                hex = hexDigit + hex;
+            const state = {
+                // Current mode: 'converter' or 'drill'
+                mode: 'converter',
                 
-                // Show the divide by 2 four times concept
-                var temp = num;
-                var divSteps = [];
-                for (var d = 0; d < 4 && temp > 0; d++) {
-                    divSteps.push(temp + '÷2=' + Math.floor(temp/2));
-                    temp = Math.floor(temp / 2);
-                }
+                // Converter state
+                inputBase: 10,
+                outputBases: [10, 2, 16],
                 
-                steps.push(num + ' ÷ 16 = ' + Math.floor(num / 16) + ', remainder = ' + remainder + ' (' + hexDigit + ')');
-                num = Math.floor(num / 16);
-            }
-            
-            steps.push('Reading remainders from bottom to top: ' + hex);
-            return { result: hex, steps: steps };
-        }
-
-        /**
-         * Hex to Decimal via weighted sums (positional notation)
-         */
-        function hexToDecimal(hex) {
-            var steps = [];
-            var upper = hex.toUpperCase();
-            var digits = upper.split('').reverse();
-            var decimal = 0;
-            
-            steps.push('Converting ' + upper + ' to decimal using positional values:');
-            steps.push('Each position is multiplied by 16^position:');
-            
-            var terms = [];
-            for (var i = 0; i < digits.length; i++) {
-                var digitValue = parseInt(digits[i], 16);
-                var power = Math.pow(16, i);
-                var contribution = digitValue * power;
-                decimal += contribution;
-                
-                if (contribution > 0) {
-                    terms.push(contribution);
-                }
-                
-                steps.push('  Position ' + i + ': ' + digits[i] + ' × 16^' + i + ' = ' + digitValue + ' × ' + power + ' = ' + contribution);
-            }
-            
-            if (terms.length > 0) {
-                steps.push('Sum: ' + terms.reverse().join(' + ') + ' = ' + decimal);
-            }
-            
-            return { result: decimal.toString(), steps: steps };
-        }
-
-        /**
-         * Main conversion router
-         */
-        function convert(value, fromBase, toBase) {
-            if (!value || !isValidInput(value, fromBase)) {
-                return { result: '', steps: [] };
-            }
-            
-            if (fromBase === toBase) {
-                return { result: value.toUpperCase(), steps: ['Same base - no conversion needed'] };
-            }
-            
-            if (fromBase === 'decimal' && toBase === 'binary') return decimalToBinary(value);
-            if (fromBase === 'binary' && toBase === 'decimal') return binaryToDecimal(value);
-            if (fromBase === 'decimal' && toBase === 'hex') return decimalToHex(value);
-            if (fromBase === 'hex' && toBase === 'decimal') return hexToDecimal(value);
-            if (fromBase === 'binary' && toBase === 'hex') return binaryToHex(value);
-            if (fromBase === 'hex' && toBase === 'binary') return hexToBinary(value);
-            
-            return { result: '', steps: [] };
-        }
-
-        // ============================================================
-        // CONVERTER MODE
-        // ============================================================
-        function updateConverter() {
-            var inputEl = document.getElementById('inputValue');
-            var value = inputEl.value.trim();
-            var fromBase = document.getElementById('inputBase').value;
-            var toBase = document.getElementById('outputBase').value;
-            var outputSection = document.getElementById('outputSection');
-
-            // Validate and highlight invalid input
-            if (value && !isValidInput(value, fromBase)) {
-                inputEl.classList.add('invalid');
-                outputSection.innerHTML = '';
-                return;
-            }
-            inputEl.classList.remove('invalid');
-
-            // Empty input
-            if (!value) {
-                outputSection.innerHTML = '';
-                return;
-            }
-
-            // Determine output bases
-            var bases = (toBase === 'all') ? ['decimal', 'binary', 'hex'] : [toBase];
-            var labels = { decimal: 'Decimal', binary: 'Binary', hex: 'Hexadecimal' };
-            var html = '';
-
-            for (var i = 0; i < bases.length; i++) {
-                var base = bases[i];
-                if (base === fromBase) continue;
-                
-                var conversion = convert(value, fromBase, base);
-                var result = conversion.result || '—';
-                
-                html += '<div class="output-item">';
-                html += '<div class="output-label">' + labels[base] + '</div>';
-                html += '<div class="output-value">' + result + '</div>';
-                html += '</div>';
-            }
-
-            outputSection.innerHTML = html;
-        }
-
-        // ============================================================
-        // DRILL SETUP
-        // ============================================================
-        function setPreset(p) {
-            preset = p;
-            
-            // Update button states
-            document.getElementById('presetEasy').classList.remove('active');
-            document.getElementById('presetMedium').classList.remove('active');
-            document.getElementById('presetHard').classList.remove('active');
-            document.getElementById('presetCustom').classList.remove('active');
-            
-            var presetConfigs = {
-                easy: { min: 1, max: 15, btn: 'presetEasy' },
-                medium: { min: 16, max: 255, btn: 'presetMedium' },
-                hard: { min: 256, max: 4095, btn: 'presetHard' },
-                custom: { min: rangeMin, max: rangeMax, btn: 'presetCustom' }
-            };
-            
-            var config = presetConfigs[p];
-            document.getElementById(config.btn).classList.add('active');
-            
-            if (p !== 'custom') {
-                rangeMin = config.min;
-                rangeMax = config.max;
-                document.getElementById('rangeMin').value = rangeMin;
-                document.getElementById('rangeMax').value = rangeMax;
-            }
-            
-            // Enable/disable custom range inputs
-            var isCustom = (p === 'custom');
-            document.getElementById('customRangeGroup').style.opacity = isCustom ? '1' : '0.5';
-            document.getElementById('rangeMin').disabled = !isCustom;
-            document.getElementById('rangeMax').value = rangeMax;
-            }
-            
-            // Enable/disable custom range inputs
-            var isCustom = (p === 'custom');
-            document.getElementById('customRangeGroup').style.opacity = isCustom ? '1' : '0.5';
-            document.getElementById('rangeMin').disabled = !isCustom;
-            document.getElementById('rangeMax').disabled = !isCustom;
-            
-            saveSettings();
-        }
-
-        function updateCustomRange() {
-            rangeMin = parseInt(document.getElementById('rangeMin').value) || 1;
-            rangeMax = parseInt(document.getElementById('rangeMax').value) || 15;
-            if (rangeMin < 0) rangeMin = 0;
-            if (rangeMax < rangeMin) rangeMax = rangeMin;
-            saveSettings();
-        }
-
-        function toggleTimeLimit() {
-            var enabled = document.getElementById('timeLimitEnabled').checked;
-            document.getElementById('timeLimitGroup').classList.toggle('hidden', !enabled);
-            saveSettings();
-        }
-
-        // ============================================================
-        // DRILL LOGIC
-        // ============================================================
-        function generateQuestion() {
-            var conversionTypes = [
-                { from: 'decimal', to: 'binary', id: 'dec-to-bin' },
-                { from: 'binary', to: 'decimal', id: 'bin-to-dec' },
-                { from: 'decimal', to: 'hex', id: 'dec-to-hex' },
-                { from: 'hex', to: 'decimal', id: 'hex-to-dec' },
-                { from: 'binary', to: 'hex', id: 'bin-to-hex' },
-                { from: 'hex', to: 'binary', id: 'hex-to-bin' }
-            ];
-
-            var selectedType = document.getElementById('conversionType').value;
-            var type;
-            
-            if (selectedType === 'random') {
-                type = conversionTypes[Math.floor(Math.random() * conversionTypes.length)];
-            } else {
-                for (var i = 0; i < conversionTypes.length; i++) {
-                    if (conversionTypes[i].id === selectedType) {
-                        type = conversionTypes[i];
-                        break;
-                    }
-                }
-            }
-
-            // Generate random decimal in range
-            var decimal = Math.floor(Math.random() * (rangeMax - rangeMin + 1)) + rangeMin;
-            
-            // Convert to question value in source base
-            var questionValue;
-            if (type.from === 'decimal') {
-                questionValue = decimal.toString();
-            } else if (type.from === 'binary') {
-                questionValue = decimalToBinary(decimal).result;
-            } else {
-                questionValue = decimalToHex(decimal).result;
-            }
-
-            // Get correct answer
-            var conversion = convert(questionValue, type.from, type.to);
-
-            return {
-                value: questionValue,
-                fromBase: type.from,
-                toBase: type.to,
-                correctAnswer: conversion.result,
-                steps: conversion.steps
-            };
-        }
-
-        function startDrill() {
-            // Read settings
-            rangeMin = parseInt(document.getElementById('rangeMin').value) || 1;
-            rangeMax = parseInt(document.getElementById('rangeMax').value) || 15;
-            var questionCount = parseInt(document.getElementById('questionCount').value) || 10;
-            
-            if (rangeMin < 0) rangeMin = 0;
-            if (rangeMax < rangeMin) rangeMax = rangeMin;
-            if (questionCount < 1) questionCount = 1;
-            if (questionCount > 100) questionCount = 100;
-
-            // Generate questions
-            questions = [];
-            for (var i = 0; i < questionCount; i++) {
-                questions.push(generateQuestion());
-            }
-
-            // Reset state
-            currentIndex = 0;
-            answers = [];
-            drillStartTime = Date.now();
-
-            // Show question view
-            document.getElementById('drillSetup').classList.add('hidden');
-            document.getElementById('drillQuestion').classList.remove('hidden');
-            document.getElementById('drillSummary').classList.add('hidden');
-            
-            showQuestion();
-        }
-
-        function showQuestion() {
-            var q = questions[currentIndex];
-            var baseLabels = { decimal: 'Decimal', binary: 'Binary', hex: 'Hexadecimal' };
-
-            // Update UI
-            document.getElementById('questionProgress').textContent = 'Question ' + (currentIndex + 1) + ' of ' + questions.length;
-            document.getElementById('questionText').textContent = 'Convert to ' + baseLabels[q.toBase] + ':';
-            document.getElementById('questionValue').textContent = q.value;
-            
-            // Reset answer input
-            document.getElementById('answerInput').value = '';
-            document.getElementById('answerInput').focus();
-            
-            // Set appropriate keyboard
-            if (q.toBase === 'decimal') {
-                document.getElementById('answerInput').setAttribute('inputmode', 'numeric');
-            } else {
-                document.getElementById('answerInput').setAttribute('inputmode', 'text');
-            }
-            
-            // Show submit, hide feedback
-            document.getElementById('feedbackSection').classList.add('hidden');
-            document.getElementById('submitBtn').classList.remove('hidden');
-            
-            // Reset steps toggle
-            document.getElementById('stepsContent').classList.remove('visible');
-            document.getElementById('stepsToggle').textContent = '▼';
-
-            // Start timer
-            questionStartTime = Date.now();
-            
-            if (document.getElementById('timeLimitEnabled').checked) {
-                startQuestionTimer();
-            } else {
-                document.getElementById('timer').textContent = '';
-            }
-        }
-
-        function startQuestionTimer() {
-            clearInterval(timerInterval);
-            
-            var timeLimit = parseInt(document.getElementById('timeLimit').value) || 30;
-            var remaining = timeLimit;
-            
-            document.getElementById('timer').textContent = remaining + 's';
-
-            timerInterval = setInterval(function() {
-                remaining--;
-                document.getElementById('timer').textContent = remaining + 's';
-                
-                if (remaining <= 0) {
-                    clearInterval(timerInterval);
-                    doSubmitAnswer(true);
-                }
-            }, 1000);
-        }
-
-        function submitAnswer() {
-            doSubmitAnswer(false);
-        }
-
-        function doSubmitAnswer(isTimeout) {
-            clearInterval(timerInterval);
-
-            var q = questions[currentIndex];
-            var userAnswer = document.getElementById('answerInput').value.trim().toUpperCase();
-            var correctAnswer = q.correctAnswer.toUpperCase();
-            var isCorrect = !isTimeout && (userAnswer === correctAnswer);
-            var timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
-
-            // Record answer
-            answers.push({
-                question: q,
-                userAnswer: isTimeout ? '(timeout)' : userAnswer,
-                isCorrect: isCorrect,
-                timeTaken: timeTaken
-            });
-
-            // Show feedback
-            var feedbackEl = document.getElementById('feedbackMessage');
-            if (isCorrect) {
-                feedbackEl.textContent = 'Correct! ✓';
-                feedbackEl.className = 'feedback correct';
-                document.getElementById('correctAnswerDisplay').textContent = '';
-            } else {
-                feedbackEl.textContent = isTimeout ? "Time's up! ✗" : 'Incorrect ✗';
-                feedbackEl.className = 'feedback incorrect';
-                document.getElementById('correctAnswerDisplay').textContent = 'Correct answer: ' + q.correctAnswer;
-            }
-
-            // Show steps
-            var stepsHtml = '';
-            for (var i = 0; i < q.steps.length; i++) {
-                stepsHtml += '<div class="step">' + q.steps[i] + '</div>';
-            }
-            document.getElementById('stepsContent').innerHTML = stepsHtml;
-
-            // Update UI
-            document.getElementById('feedbackSection').classList.remove('hidden');
-            document.getElementById('submitBtn').classList.add('hidden');
-        }
-
-        function toggleSteps() {
-            var content = document.getElementById('stepsContent');
-            var toggle = document.getElementById('stepsToggle');
-            content.classList.toggle('visible');
-            toggle.textContent = content.classList.contains('visible') ? '▲' : '▼';
-        }
-
-        function continueToNext() {
-            currentIndex++;
-            
-            if (currentIndex < questions.length) {
-                showQuestion();
-            } else {
-                showSummary();
-            }
-        }
-
-        function handleAnswerKey(e) {
-            if (e.key === 'Enter') {
-                var submitBtn = document.getElementById('submitBtn');
-                if (!submitBtn.classList.contains('hidden')) {
-                    submitAnswer();
-                } else {
-                    continueToNext();
-                }
-            }
-        }
-
-        function formatTime(seconds) {
-            if (seconds < 60) return seconds + 's';
-            var mins = Math.floor(seconds / 60);
-            var secs = seconds % 60;
-            return mins + 'm ' + secs + 's';
-        }
-
-        function showSummary() {
-            var totalTime = Math.floor((Date.now() - drillStartTime) / 1000);
-            var correctCount = 0;
-            
-            for (var i = 0; i < answers.length; i++) {
-                if (answers[i].isCorrect) correctCount++;
-            }
-            
-            var accuracy = Math.round((correctCount / answers.length) * 100);
-            var avgTime = Math.floor(totalTime / answers.length);
-
-            // Update stats
-            document.getElementById('accuracyStat').textContent = accuracy + '%';
-            document.getElementById('totalTimeStat').textContent = formatTime(totalTime);
-            document.getElementById('avgTimeStat').textContent = formatTime(avgTime);
-
-            // Build question list
-            var baseLabels = { decimal: 'Dec', binary: 'Bin', hex: 'Hex' };
-            var html = '';
-
-            for (var i = 0; i < answers.length; i++) {
-                var a = answers[i];
-                var q = a.question;
-                
-                // Build steps HTML
-                var stepsHtml = '';
-                for (var j = 0; j < q.steps.length; j++) {
-                    stepsHtml += '<div class="step">' + q.steps[j] + '</div>';
-                }
-
-                html += '<div class="question-item ' + (a.isCorrect ? 'correct' : 'incorrect') + '">';
-                html += '<div class="question-detail">';
-                html += '<span>' + baseLabels[q.fromBase] + ' → ' + baseLabels[q.toBase] + ': ' + q.value + '</span>';
-                html += '<span>' + formatTime(a.timeTaken) + '</span>';
-                html += '</div>';
-                html += '<div class="question-detail">';
-                html += '<span>Your answer: ' + a.userAnswer + '</span>';
-                html += '<span>Correct: ' + q.correctAnswer + '</span>';
-                html += '</div>';
-                html += '<button type="button" class="toggle-steps-btn" onclick="toggleSummarySteps(' + i + ')">Show Steps</button>';
-                html += '<div class="steps-content" id="summarySteps' + i + '">' + stepsHtml + '</div>';
-                html += '</div>';
-            }
-
-            document.getElementById('questionList').innerHTML = html;
-
-            // Show summary view
-            document.getElementById('drillQuestion').classList.add('hidden');
-            document.getElementById('drillSummary').classList.remove('hidden');
-        }
-
-        function toggleSummarySteps(index) {
-            var el = document.getElementById('summarySteps' + index);
-            el.classList.toggle('visible');
-        }
-
-        function resetDrill() {
-            clearInterval(timerInterval);
-            document.getElementById('drillSummary').classList.add('hidden');
-            document.getElementById('drillSetup').classList.remove('hidden');
-        }
-
-        // ============================================================
-        // PERSISTENCE (localStorage)
-        // ============================================================
-        function saveSettings() {
-            try {
-                var data = {
-                    theme: theme,
-                    preset: preset,
-                    rangeMin: rangeMin,
-                    rangeMax: rangeMax,
-                    conversionType: document.getElementById('conversionType').value,
-                    questionCount: document.getElementById('questionCount').value,
-                    timeLimitEnabled: document.getElementById('timeLimitEnabled').checked,
-                    timeLimit: document.getElementById('timeLimit').value
-                };
-                localStorage.setItem('cabsLearner', JSON.stringify(data));
-            } catch (e) {
-                // localStorage not available
-            }
-        }
-
-        function loadSettings() {
-            try {
-                var saved = localStorage.getItem('cabsLearner');
-                if (!saved) return;
-                
-                var data = JSON.parse(saved);
+                // Drill state
+                drill: {
+                    active: false,
+                    conversionType: 'random',
+                    rangeMin: 0,
+                    rangeMax: 15,
+                    questionCount: 10,
+                    timeLimit: null,
+                    currentQuestion: 0,
+                    questions: [],
+                    startTime: null,
+                    questionStartTime: null,
+                    timerInterval: null
+                },
                 
                 // Theme
-                if (data.theme === 'light') {
-                    theme = 'light';
-                    document.body.classList.add('light-mode');
-                    document.getElementById('themeBtn').textContent = '☀️';
-                }
+                darkMode: true,
                 
-                // Preset
-                if (data.preset) {
-                    preset = data.preset;
-                    if (data.rangeMin) rangeMin = data.rangeMin;
-                    if (data.rangeMax) rangeMax = data.rangeMax;
-                    setPreset(preset);
+                // Stats (persisted)
+                stats: {
+                    totalDrills: 0,
+                    totalQuestions: 0,
+                    correctAnswers: 0
                 }
-                
-                // Other settings
-                if (data.conversionType) {
-                    document.getElementById('conversionType').value = data.conversionType;
-                }
-                if (data.questionCount) {
-                    document.getElementById('questionCount').value = data.questionCount;
-                }
-                if (data.timeLimitEnabled) {
-                    document.getElementById('timeLimitEnabled').checked = true;
-                    document.getElementById('timeLimitGroup').classList.remove('hidden');
-                }
-                if (data.timeLimit) {
-                    document.getElementById('timeLimit').value = data.timeLimit;
-                }
-            } catch (e) {
-                // localStorage not available or corrupted data
-            }
-        }
+            };
 
-        // ============================================================
-        // INITIALIZATION
-        // ============================================================
-        loadSettings();
+            // ============================================
+            // DOM ELEMENTS
+            // ============================================
+            
+            const elements = {
+                // Mode tabs
+                modeTabs: document.querySelectorAll('.mode-tab'),
+                
+                // Views
+                converterView: document.getElementById('converterView'),
+                drillSetupView: document.getElementById('drillSetupView'),
+                drillQuestionView: document.getElementById('drillQuestionView'),
+                drillSummaryView: document.getElementById('drillSummaryView'),
+                
+                // Converter
+                inputBaseSelector: document.getElementById('inputBaseSelector'),
+                outputBaseSelector: document.getElementById('outputBaseSelector'),
+                converterInput: document.getElementById('converterInput'),
+                inputValidation: document.getElementById('inputValidation'),
+                converterOutput: document.getElementById('converterOutput'),
+                
+                // Drill setup
+                conversionType: document.getElementById('conversionType'),
+                difficultyPresets: document.getElementById('difficultyPresets'),
+                rangeMin: document.getElementById('rangeMin'),
+                rangeMax: document.getElementById('rangeMax'),
+                questionCount: document.getElementById('questionCount'),
+                timeLimitToggle: document.getElementById('timeLimitToggle'),
+                timeLimitOptions: document.getElementById('timeLimitOptions'),
+                timeLimit: document.getElementById('timeLimit'),
+                startDrillBtn: document.getElementById('startDrillBtn'),
+                
+                // Drill question
+                questionProgress: document.getElementById('questionProgress'),
+                questionTimer: document.getElementById('questionTimer'),
+                questionPrompt: document.getElementById('questionPrompt'),
+                questionValue: document.getElementById('questionValue'),
+                questionTarget: document.getElementById('questionTarget'),
+                drillAnswer: document.getElementById('drillAnswer'),
+                submitAnswerBtn: document.getElementById('submitAnswerBtn'),
+                feedbackSection: document.getElementById('feedbackSection'),
+                feedbackMessage: document.getElementById('feedbackMessage'),
+                correctAnswerDisplay: document.getElementById('correctAnswerDisplay'),
+                showStepsBtn: document.getElementById('showStepsBtn'),
+                stepsContent: document.getElementById('stepsContent'),
+                continueBtn: document.getElementById('continueBtn'),
+                
+                // Drill summary
+                summaryAccuracy: document.getElementById('summaryAccuracy'),
+                summaryTotal: document.getElementById('summaryTotal'),
+                summaryAvg: document.getElementById('summaryAvg'),
+                questionList: document.getElementById('questionList'),
+                newDrillBtn: document.getElementById('newDrillBtn'),
+                
+                // Theme & tutorial
+                themeToggle: document.getElementById('themeToggle'),
+                tutorialBtn: document.getElementById('tutorialBtn'),
+                tutorialModal: document.getElementById('tutorialModal'),
+                closeTutorial: document.getElementById('closeTutorial')
+            };
+
+            // ============================================
+            // CONVERSION UTILITIES
+            // ============================================
+            
+            /**
+             * Validates if a string contains only valid characters for a given base
+             * Returns an array of {char, valid} objects for highlighting
+             */
+            function validateInput(value, base) {
+                const validChars = {
+                    2: '01',
+                    10: '0123456789',
+                    16: '0123456789ABCDEFabcdef'
+                };
+                
+                const allowed = validChars[base];
+                const result = [];
+                let hasInvalid = false;
+                
+                for (const char of value) {
+                    const valid = allowed.includes(char);
+                    if (!valid) hasInvalid = true;
+                    result.push({ char, valid });
+                }
+                
+                return { chars: result, hasInvalid };
+            }
+
+            /**
+             * Extracts only valid characters from input
+             */
+            function getValidValue(value, base) {
+                const validChars = {
+                    2: '01',
+                    10: '0123456789',
+                    16: '0123456789ABCDEFabcdef'
+                };
+                
+                const allowed = validChars[base];
+                return value.split('').filter(c => allowed.includes(c)).join('');
+            }
+
+            /**
+             * Converts a number from one base to another
+             * Returns the converted value as a string (uppercase for hex)
+             */
+            function convert(value, fromBase, toBase) {
+                if (!value || value === '') return '';
+                
+                // Clean input (uppercase for hex)
+                const cleanValue = getValidValue(value.toUpperCase(), fromBase);
+                if (!cleanValue) return '';
+                
+                // Convert to decimal first
+                let decimal;
+                if (fromBase === 10) {
+                    decimal = parseInt(cleanValue, 10);
+                } else if (fromBase === 2) {
+                    decimal = parseInt(cleanValue, 2);
+                } else if (fromBase === 16) {
+                    decimal = parseInt(cleanValue, 16);
+                }
+                
+                if (isNaN(decimal)) return '';
+                
+                // Convert from decimal to target base
+                if (toBase === 10) {
+                    return decimal.toString(10);
+                } else if (toBase === 2) {
+                    return decimal.toString(2);
+                } else if (toBase === 16) {
+                    return decimal.toString(16).toUpperCase();
+                }
+                
+                return '';
+            }
+
+            /**
+             * Generates step-by-step conversion explanation
+             * Different methods based on conversion type
+             */
+            function generateSteps(value, fromBase, toBase, correctAnswer) {
+                const cleanValue = getValidValue(value.toUpperCase(), fromBase);
+                if (!cleanValue) return [];
+                
+                const steps = [];
+                
+                // Decimal to Binary: powers of two method
+                if (fromBase === 10 && toBase === 2) {
+                    const decimal = parseInt(cleanValue, 10);
+                    steps.push(`Starting with decimal: ${decimal}`);
+                    steps.push(`Method: Repeatedly divide by 2, collect remainders`);
+                    steps.push('');
+                    
+                    let num = decimal;
+                    const remainders = [];
+                    let stepNum = 1;
+                    
+                    if (num === 0) {
+                        steps.push('0 ÷ 2 = 0 remainder 0');
+                        remainders.push(0);
+                    } else {
+                        while (num > 0) {
+                            const remainder = num % 2;
+                            const quotient = Math.floor(num / 2);
+                            steps.push(`${stepNum}. ${num} ÷ 2 = ${quotient} remainder ${remainder}`);
+                            remainders.push(remainder);
+                            num = quotient;
+                            stepNum++;
+                        }
+                    }
+                    
+                    steps.push('');
+                    steps.push(`Reading remainders bottom-to-top: ${remainders.reverse().join('')}`);
+                    steps.push(`Result: ${correctAnswer}`);
+                }
+                
+                // Binary to Decimal: powers of two method
+                else if (fromBase === 2 && toBase === 10) {
+                    steps.push(`Starting with binary: ${cleanValue}`);
+                    steps.push(`Method: Sum powers of 2 for each '1' bit`);
+                    steps.push('');
+                    
+                    const bits = cleanValue.split('').reverse();
+                    const terms = [];
+                    let sum = 0;
+                    
+                    bits.forEach((bit, i) => {
+                        if (bit === '1') {
+                            const power = Math.pow(2, i);
+                            terms.push(`2^${i} = ${power}`);
+                            sum += power;
+                        }
+                    });
+                    
+                    if (terms.length === 0) {
+                        steps.push('No 1 bits, result is 0');
+                    } else {
+                        terms.reverse().forEach(t => steps.push(t));
+                        steps.push('');
+                        steps.push(`Sum: ${terms.map(t => t.split(' = ')[1]).join(' + ')} = ${sum}`);
+                    }
+                    
+                    steps.push(`Result: ${correctAnswer}`);
+                }
+                
+                // Decimal to Hexadecimal: divide by 16 (as divide by 2 four times)
+                else if (fromBase === 10 && toBase === 16) {
+                    const decimal = parseInt(cleanValue, 10);
+                    steps.push(`Starting with decimal: ${decimal}`);
+                    steps.push(`Method: Divide by 16 (shown as 4 binary divisions)`);
+                    steps.push('');
+                    
+                    let num = decimal;
+                    const hexDigits = [];
+                    
+                    if (num === 0) {
+                        hexDigits.push('0');
+                        steps.push('0 gives hex digit 0');
+                    } else {
+                        let digitCount = 1;
+                        while (num > 0) {
+                            // Show the 4 binary divisions
+                            let tempNum = num;
+                            let fourBitRemainder = 0;
+                            
+                            steps.push(`Hex digit ${digitCount}:`);
+                            
+                            for (let i = 0; i < 4 && tempNum > 0; i++) {
+                                const remainder = tempNum % 2;
+                                fourBitRemainder += remainder * Math.pow(2, i);
+                                tempNum = Math.floor(tempNum / 2);
+                            }
+                            
+                            // Actually get the hex digit
+                            const hexRemainder = num % 16;
+                            const quotient = Math.floor(num / 16);
+                            const hexChar = '0123456789ABCDEF'[hexRemainder];
+                            
+                            steps.push(`  ${num} mod 16 = ${hexRemainder} (${hexChar})`);
+                            steps.push(`  ${num} ÷ 16 = ${quotient}`);
+                            
+                            hexDigits.push(hexChar);
+                            num = quotient;
+                            digitCount++;
+                        }
+                    }
+                    
+                    steps.push('');
+                    steps.push(`Reading digits bottom-to-top: ${hexDigits.reverse().join('')}`);
+                    steps.push(`Result: ${correctAnswer}`);
+                }
+                
+                // Hexadecimal to Decimal: weighted sums
+                else if (fromBase === 16 && toBase === 10) {
+                    steps.push(`Starting with hexadecimal: ${cleanValue}`);
+                    steps.push(`Method: Multiply each digit by its power of 16`);
+                    steps.push('');
+                    
+                    const hexMap = { '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,
+                                     '8': 8, '9': 9, 'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15 };
+                    
+                    const digits = cleanValue.split('').reverse();
+                    const terms = [];
+                    let sum = 0;
+                    
+                    digits.forEach((digit, i) => {
+                        const val = hexMap[digit];
+                        const power = Math.pow(16, i);
+                        const product = val * power;
+                        terms.push(`${digit} × 16^${i} = ${val} × ${power} = ${product}`);
+                        sum += product;
+                    });
+                    
+                    terms.reverse().forEach(t => steps.push(t));
+                    steps.push('');
+                    steps.push(`Sum: ${sum}`);
+                    steps.push(`Result: ${correctAnswer}`);
+                }
+                
+                // Binary to Hexadecimal: 4-bit grouping
+                else if (fromBase === 2 && toBase === 16) {
+                    steps.push(`Starting with binary: ${cleanValue}`);
+                    steps.push(`Method: Group into 4-bit chunks, convert each to hex`);
+                    steps.push('');
+                    
+                    // Pad to multiple of 4
+                    let padded = cleanValue;
+                    while (padded.length % 4 !== 0) {
+                        padded = '0' + padded;
+                    }
+                    
+                    steps.push(`Padded: ${padded}`);
+                    steps.push('');
+                    
+                    const hexDigits = [];
+                    for (let i = 0; i < padded.length; i += 4) {
+                        const group = padded.substr(i, 4);
+                        const decimal = parseInt(group, 2);
+                        const hex = '0123456789ABCDEF'[decimal];
+                        steps.push(`${group} = ${decimal} = ${hex}`);
+                        hexDigits.push(hex);
+                    }
+                    
+                    steps.push('');
+                    steps.push(`Result: ${hexDigits.join('')}`);
+                }
+                
+                // Hexadecimal to Binary: 4-bit expansion
+                else if (fromBase === 16 && toBase === 2) {
+                    steps.push(`Starting with hexadecimal: ${cleanValue}`);
+                    steps.push(`Method: Convert each hex digit to 4-bit binary`);
+                    steps.push('');
+                    
+                    const hexMap = { '0': '0000', '1': '0001', '2': '0010', '3': '0011',
+                                     '4': '0100', '5': '0101', '6': '0110', '7': '0111',
+                                     '8': '1000', '9': '1001', 'A': '1010', 'B': '1011',
+                                     'C': '1100', 'D': '1101', 'E': '1110', 'F': '1111' };
+                    
+                    const binaryParts = [];
+                    for (const digit of cleanValue) {
+                        const binary = hexMap[digit];
+                        steps.push(`${digit} = ${binary}`);
+                        binaryParts.push(binary);
+                    }
+                    
+                    // Remove leading zeros
+                    let result = binaryParts.join('');
+                    result = result.replace(/^0+/, '') || '0';
+                    
+                    steps.push('');
+                    steps.push(`Combined: ${binaryParts.join('')}`);
+                    steps.push(`Result: ${result}`);
+                }
+                
+                return steps;
+            }
+
+            // ============================================
+            // CONVERTER MODE
+            // ============================================
+            
+            /**
+             * Updates the converter output based on current input
+             */
+            function updateConverter() {
+                const value = elements.converterInput.value;
+                const validation = validateInput(value, state.inputBase);
+                
+                // Show validation highlighting
+                if (value && validation.hasInvalid) {
+                    elements.inputValidation.style.display = 'block';
+                    elements.inputValidation.innerHTML = validation.chars.map(c => 
+                        `<span class="${c.valid ? 'char-valid' : 'char-invalid'}">${c.char}</span>`
+                    ).join('');
+                    elements.converterInput.classList.add('has-error');
+                } else {
+                    elements.inputValidation.style.display = 'none';
+                    elements.converterInput.classList.remove('has-error');
+                }
+                
+                // Generate outputs
+                const cleanValue = getValidValue(value.toUpperCase(), state.inputBase);
+                
+                if (!cleanValue) {
+                    elements.converterOutput.innerHTML = '<p class="text-center" style="color: var(--text-muted);">Enter a value above</p>';
+                    return;
+                }
+                
+                const baseNames = { 2: 'Binary', 10: 'Decimal', 16: 'Hexadecimal' };
+                let outputHTML = '';
+                
+                state.outputBases.forEach(base => {
+                    if (base !== state.inputBase) {
+                        const converted = convert(cleanValue, state.inputBase, base);
+                        outputHTML += `
+                            <div class="output-row">
+                                <span class="output-label">${baseNames[base]}</span>
+                                <span class="output-value">${converted}</span>
+                            </div>
+                        `;
+                    }
+                });
+                
+                // Also show input in its own base
+                outputHTML = `
+                    <div class="output-row">
+                        <span class="output-label">${baseNames[state.inputBase]} (input)</span>
+                        <span class="output-value">${cleanValue.toUpperCase()}</span>
+                    </div>
+                ` + outputHTML;
+                
+                elements.converterOutput.innerHTML = outputHTML;
+            }
+
+            /**
+             * Sets the input type for the converter input
+             */
+            function updateInputType() {
+                if (state.inputBase === 10) {
+                    elements.converterInput.setAttribute('inputmode', 'numeric');
+                } else {
+                    elements.converterInput.setAttribute('inputmode', 'text');
+                }
+            }
+
+            // ============================================
+            // DRILL MODE
+            // ============================================
+            
+            /**
+             * Generates a random number within the configured range
+             */
+            function generateRandomNumber(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            /**
+             * Gets a random conversion type
+             */
+            function getRandomConversionType() {
+                const types = ['dec2bin', 'bin2dec', 'dec2hex', 'hex2dec', 'bin2hex', 'hex2bin'];
+                return types[Math.floor(Math.random() * types.length)];
+            }
+
+            /**
+             * Parses conversion type to get from/to bases
+             */
+            function parseConversionType(type) {
+                const mapping = {
+                    'dec2bin': { from: 10, to: 2 },
+                    'bin2dec': { from: 2, to: 10 },
+                    'dec2hex': { from: 10, to: 16 },
+                    'hex2dec': { from: 16, to: 10 },
+                    'bin2hex': { from: 2, to: 16 },
+                    'hex2bin': { from: 16, to: 2 }
+                };
+                return mapping[type];
+            }
+
+            /**
+             * Gets the display name for a base
+             */
+            function getBaseName(base) {
+                return { 2: 'Binary', 10: 'Decimal', 16: 'Hexadecimal' }[base];
+            }
+
+            /**
+             * Generates all questions for the drill
+             */
+            function generateQuestions() {
+                const questions = [];
+                const { rangeMin, rangeMax, questionCount, conversionType } = state.drill;
+                
+                for (let i = 0; i < questionCount; i++) {
+                    // Get conversion type (random or fixed)
+                    const type = conversionType === 'random' ? getRandomConversionType() : conversionType;
+                    const { from, to } = parseConversionType(type);
+                    
+                    // Generate decimal value, then convert to question format
+                    const decimalValue = generateRandomNumber(rangeMin, rangeMax);
+                    const questionValue = convert(decimalValue.toString(), 10, from);
+                    const correctAnswer = convert(questionValue, from, to);
+                    
+                    questions.push({
+                        type,
+                        fromBase: from,
+                        toBase: to,
+                        value: questionValue,
+                        correctAnswer,
+                        userAnswer: null,
+                        correct: null,
+                        time: null
+                    });
+                }
+                
+                return questions;
+            }
+
+            /**
+             * Starts the drill
+             */
+            function startDrill() {
+                // Read settings
+                state.drill.conversionType = elements.conversionType.value;
+                state.drill.rangeMin = Math.max(0, parseInt(elements.rangeMin.value) || 0);
+                state.drill.rangeMax = Math.max(state.drill.rangeMin, parseInt(elements.rangeMax.value) || 15);
+                state.drill.questionCount = Math.min(100, Math.max(1, parseInt(elements.questionCount.value) || 10));
+                state.drill.timeLimit = elements.timeLimitToggle.classList.contains('active') 
+                    ? parseInt(elements.timeLimit.value) || 30 
+                    : null;
+                
+                // Generate questions
+                state.drill.questions = generateQuestions();
+                state.drill.currentQuestion = 0;
+                state.drill.active = true;
+                state.drill.startTime = Date.now();
+                
+                // Show question view
+                showView('drillQuestion');
+                showCurrentQuestion();
+            }
+
+            /**
+             * Displays the current question
+             */
+            function showCurrentQuestion() {
+                const q = state.drill.questions[state.drill.currentQuestion];
+                
+                elements.questionProgress.textContent = 
+                    `Question ${state.drill.currentQuestion + 1} of ${state.drill.questionCount}`;
+                elements.questionPrompt.textContent = 
+                    `Convert from ${getBaseName(q.fromBase)} to ${getBaseName(q.toBase)}:`;
+                elements.questionValue.textContent = q.value;
+                elements.questionTarget.textContent = `Enter the ${getBaseName(q.toBase)} value`;
+                
+                // Reset UI
+                elements.drillAnswer.value = '';
+                elements.drillAnswer.disabled = false;
+                elements.submitAnswerBtn.classList.remove('hidden');
+                elements.feedbackSection.classList.add('hidden');
+                elements.stepsContent.classList.add('hidden');
+                elements.showStepsBtn.textContent = 'Show Steps';
+                
+                // Set input type
+                if (q.toBase === 10) {
+                    elements.drillAnswer.setAttribute('inputmode', 'numeric');
+                } else {
+                    elements.drillAnswer.setAttribute('inputmode', 'text');
+                }
+                
+                elements.drillAnswer.focus();
+                
+                // Start timer
+                state.drill.questionStartTime = Date.now();
+                
+                if (state.drill.timeLimit) {
+                    elements.questionTimer.classList.remove('hidden');
+                    updateTimer();
+                    state.drill.timerInterval = setInterval(updateTimer, 100);
+                } else {
+                    elements.questionTimer.classList.add('hidden');
+                }
+            }
+
+            /**
+             * Updates the question timer
+             */
+            function updateTimer() {
+                const elapsed = (Date.now() - state.drill.questionStartTime) / 1000;
+                const remaining = Math.max(0, state.drill.timeLimit - elapsed);
+                elements.questionTimer.textContent = `${remaining.toFixed(1)}s`;
+                
+                if (remaining <= 0) {
+                    clearInterval(state.drill.timerInterval);
+                    submitAnswer(true);
+                }
+            }
+
+            /**
+             * Submits the current answer
+             */
+            function submitAnswer(timedOut = false) {
+                if (state.drill.timerInterval) {
+                    clearInterval(state.drill.timerInterval);
+                    state.drill.timerInterval = null;
+                }
+                
+                const q = state.drill.questions[state.drill.currentQuestion];
+                const userAnswer = elements.drillAnswer.value.toUpperCase().trim();
+                const time = (Date.now() - state.drill.questionStartTime) / 1000;
+                
+                // Record answer
+                q.userAnswer = userAnswer || (timedOut ? '(timed out)' : '(no answer)');
+                q.time = time;
+                q.correct = userAnswer === q.correctAnswer;
+                
+                // Show feedback
+                elements.drillAnswer.disabled = true;
+                elements.submitAnswerBtn.classList.add('hidden');
+                elements.feedbackSection.classList.remove('hidden');
+                
+                if (q.correct) {
+                    elements.feedbackMessage.textContent = 'Correct!';
+                    elements.feedbackMessage.className = 'feedback correct';
+                    elements.correctAnswerDisplay.classList.add('hidden');
+                } else {
+                    elements.feedbackMessage.textContent = 'Incorrect';
+                    elements.feedbackMessage.className = 'feedback incorrect';
+                    elements.correctAnswerDisplay.classList.remove('hidden');
+                    elements.correctAnswerDisplay.innerHTML = 
+                        `Correct answer: <span>${q.correctAnswer}</span>`;
+                }
+                
+                // Generate steps
+                const steps = generateSteps(q.value, q.fromBase, q.toBase, q.correctAnswer);
+                elements.stepsContent.innerHTML = steps.map(s => 
+                    `<div class="step-line">${s}</div>`
+                ).join('');
+                
+                elements.continueBtn.focus();
+            }
+
+            /**
+             * Continues to next question or summary
+             */
+            function continueToNext() {
+                state.drill.currentQuestion++;
+                
+                if (state.drill.currentQuestion >= state.drill.questionCount) {
+                    showSummary();
+                } else {
+                    showCurrentQuestion();
+                }
+            }
+
+            /**
+             * Shows the drill summary
+             */
+            function showSummary() {
+                state.drill.active = false;
+                
+                const totalTime = (Date.now() - state.drill.startTime) / 1000;
+                const correctCount = state.drill.questions.filter(q => q.correct).length;
+                const accuracy = Math.round((correctCount / state.drill.questionCount) * 100);
+                const avgTime = totalTime / state.drill.questionCount;
+                
+                // Update stats
+                state.stats.totalDrills++;
+                state.stats.totalQuestions += state.drill.questionCount;
+                state.stats.correctAnswers += correctCount;
+                saveState();
+                
+                // Display summary
+                elements.summaryAccuracy.textContent = `${accuracy}%`;
+                elements.summaryTotal.textContent = `${totalTime.toFixed(1)}s`;
+                elements.summaryAvg.textContent = `${avgTime.toFixed(1)}s`;
+                
+                // Build question list
+                let listHTML = '';
+                state.drill.questions.forEach((q, i) => {
+                    const stepsId = `steps-${i}`;
+                    const steps = generateSteps(q.value, q.fromBase, q.toBase, q.correctAnswer);
+                    
+                    listHTML += `
+                        <div class="question-item ${q.correct ? 'correct' : 'incorrect'}">
+                            <div class="question-item-header">
+                                <span class="question-item-q">${q.value} → ${q.correctAnswer}</span>
+                                <span style="color: ${q.correct ? 'var(--success)' : 'var(--error)'}">
+                                    ${q.correct ? '✓' : '✗'}
+                                </span>
+                            </div>
+                            <div class="question-item-answers">
+                                Your answer: ${q.userAnswer} | Time: ${q.time.toFixed(1)}s
+                            </div>
+                            <button class="btn mt-1" style="padding: 0.5rem; font-size: 0.75rem;" 
+                                    onclick="document.getElementById('${stepsId}').classList.toggle('hidden')">
+                                Show Steps
+                            </button>
+                            <div id="${stepsId}" class="steps-content hidden mt-1">
+                                ${steps.map(s => `<div class="step-line">${s}</div>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                elements.questionList.innerHTML = listHTML;
+                
+                showView('drillSummary');
+            }
+
+            // ============================================
+            // VIEW MANAGEMENT
+            // ============================================
+            
+            /**
+             * Shows a specific view
+             */
+            function showView(view) {
+                // Hide all views
+                elements.converterView.classList.remove('active');
+                elements.drillSetupView.classList.remove('active');
+                elements.drillQuestionView.classList.remove('active');
+                elements.drillSummaryView.classList.remove('active');
+                
+                // Show requested view
+                switch (view) {
+                    case 'converter':
+                        elements.converterView.classList.add('active');
+                        break;
+                    case 'drillSetup':
+                        elements.drillSetupView.classList.add('active');
+                        break;
+                    case 'drillQuestion':
+                        elements.drillQuestionView.classList.add('active');
+                        break;
+                    case 'drillSummary':
+                        elements.drillSummaryView.classList.add('active');
+                        break;
+                }
+            }
+
+            /**
+             * Switches between main modes
+             */
+            function switchMode(mode) {
+                state.mode = mode;
+                
+                // Update tabs
+                elements.modeTabs.forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.mode === mode);
+                });
+                
+                // Show appropriate view
+                if (mode === 'converter') {
+                    showView('converter');
+                } else {
+                    showView('drillSetup');
+                }
+            }
+
+            // ============================================
+            // THEME MANAGEMENT
+            // ============================================
+            
+            /**
+             * Toggles dark/light theme
+             */
+            function toggleTheme() {
+                state.darkMode = !state.darkMode;
+                applyTheme();
+                saveState();
+            }
+
+            /**
+             * Applies current theme
+             */
+            function applyTheme() {
+                if (state.darkMode) {
+                    document.documentElement.removeAttribute('data-theme');
+                    elements.themeToggle.textContent = '🌙';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    elements.themeToggle.textContent = '☀️';
+                }
+            }
+
+            // ============================================
+            // PERSISTENCE
+            // ============================================
+            
+            /**
+             * Saves state to localStorage
+             */
+            function saveState() {
+                const data = {
+                    darkMode: state.darkMode,
+                    stats: state.stats,
+                    drillSettings: {
+                        conversionType: state.drill.conversionType,
+                        rangeMin: state.drill.rangeMin,
+                        rangeMax: state.drill.rangeMax,
+                        questionCount: state.drill.questionCount,
+                        timeLimit: state.drill.timeLimit
+                    }
+                };
+                
+                try {
+                    localStorage.setItem('cabsLearner', JSON.stringify(data));
+                } catch (e) {
+                    // localStorage not available
+                }
+            }
+
+            /**
+             * Loads state from localStorage
+             */
+            function loadState() {
+                try {
+                    const data = JSON.parse(localStorage.getItem('cabsLearner'));
+                    if (data) {
+                        if (typeof data.darkMode === 'boolean') {
+                            state.darkMode = data.darkMode;
+                        }
+                        if (data.stats) {
+                            state.stats = { ...state.stats, ...data.stats };
+                        }
+                        if (data.drillSettings) {
+                            elements.conversionType.value = data.drillSettings.conversionType || 'random';
+                            elements.rangeMin.value = data.drillSettings.rangeMin || 0;
+                            elements.rangeMax.value = data.drillSettings.rangeMax || 15;
+                            elements.questionCount.value = data.drillSettings.questionCount || 10;
+                            if (data.drillSettings.timeLimit) {
+                                elements.timeLimitToggle.classList.add('active');
+                                elements.timeLimitOptions.classList.remove('hidden');
+                                elements.timeLimit.value = data.drillSettings.timeLimit;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // localStorage not available or parse error
+                }
+            }
+
+            // ============================================
+            // EVENT LISTENERS
+            // ============================================
+            
+            function initEventListeners() {
+                // Mode tabs
+                elements.modeTabs.forEach(tab => {
+                    tab.addEventListener('click', () => switchMode(tab.dataset.mode));
+                });
+                
+                // Input base selector
+                elements.inputBaseSelector.querySelectorAll('.base-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        elements.inputBaseSelector.querySelectorAll('.base-btn').forEach(b => 
+                            b.classList.remove('active'));
+                        btn.classList.add('active');
+                        state.inputBase = parseInt(btn.dataset.base);
+                        updateInputType();
+                        updateConverter();
+                    });
+                });
+                
+                // Output base selector (multi-select)
+                elements.outputBaseSelector.querySelectorAll('.base-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        btn.classList.toggle('active');
+                        state.outputBases = Array.from(
+                            elements.outputBaseSelector.querySelectorAll('.base-btn.active')
+                        ).map(b => parseInt(b.dataset.base));
+                        updateConverter();
+                    });
+                });
+                
+                // Converter input
+                elements.converterInput.addEventListener('input', updateConverter);
+                
+                // Difficulty presets
+                elements.difficultyPresets.querySelectorAll('.preset-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        elements.difficultyPresets.querySelectorAll('.preset-btn').forEach(b => 
+                            b.classList.remove('active'));
+                        btn.classList.add('active');
+                        elements.rangeMin.value = btn.dataset.min;
+                        elements.rangeMax.value = btn.dataset.max;
+                    });
+                });
+                
+                // Custom range inputs
+                elements.rangeMin.addEventListener('change', () => {
+                    elements.difficultyPresets.querySelectorAll('.preset-btn').forEach(b => 
+                        b.classList.remove('active'));
+                });
+                elements.rangeMax.addEventListener('change', () => {
+                    elements.difficultyPresets.querySelectorAll('.preset-btn').forEach(b => 
+                        b.classList.remove('active'));
+                });
+                
+                // Time limit toggle
+                elements.timeLimitToggle.addEventListener('click', () => {
+                    elements.timeLimitToggle.classList.toggle('active');
+                    elements.timeLimitOptions.classList.toggle('hidden');
+                });
+                
+                // Start drill
+                elements.startDrillBtn.addEventListener('click', startDrill);
+                
+                // Submit answer
+                elements.submitAnswerBtn.addEventListener('click', () => submitAnswer());
+                elements.drillAnswer.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !elements.submitAnswerBtn.classList.contains('hidden')) {
+                        submitAnswer();
+                    }
+                });
+                
+                // Show steps toggle
+                elements.showStepsBtn.addEventListener('click', () => {
+                    elements.stepsContent.classList.toggle('hidden');
+                    elements.showStepsBtn.textContent = 
+                        elements.stepsContent.classList.contains('hidden') ? 'Show Steps' : 'Hide Steps';
+                });
+                
+                // Continue button
+                elements.continueBtn.addEventListener('click', continueToNext);
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !elements.feedbackSection.classList.contains('hidden')) {
+                        continueToNext();
+                    }
+                });
+                
+                // New drill
+                elements.newDrillBtn.addEventListener('click', () => showView('drillSetup'));
+                
+                // Theme toggle
+                elements.themeToggle.addEventListener('click', toggleTheme);
+                
+                // Tutorial
+                elements.tutorialBtn.addEventListener('click', () => {
+                    elements.tutorialModal.classList.add('active');
+                });
+                elements.closeTutorial.addEventListener('click', () => {
+                    elements.tutorialModal.classList.remove('active');
+                });
+                elements.tutorialModal.addEventListener('click', (e) => {
+                    if (e.target === elements.tutorialModal) {
+                        elements.tutorialModal.classList.remove('active');
+                    }
+                });
+            }
+
+            // ============================================
+            // INITIALIZATION
+            // ============================================
+            
+            function init() {
+                loadState();
+                applyTheme();
+                updateInputType();
+                initEventListeners();
+            }
+            
+            // Start the app
+            init();
+        })();
     </script>
 </body>
 </html>
