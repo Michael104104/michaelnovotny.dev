@@ -193,7 +193,7 @@
                 </div>
                 <textarea 
                     id="hexInput" 
-                    placeholder="Type or paste hex here (e.g., 48 65 6c 6c 6f)..."
+                    placeholder="Type or paste hex here (e.g., 48656C6C6F)..."
                     oninput="hexToText()"
                 ></textarea>
                 <div class="error-msg" id="hexError"></div>
@@ -215,8 +215,6 @@
         function textToHex() {
             lastEdited = 'text';
             const text = document.getElementById('textInput').value;
-            const separator = document.getElementById('separator').value;
-            const casing = document.getElementById('casing').value;
             
             document.getElementById('textError').textContent = '';
             
@@ -228,13 +226,9 @@
             const encoder = new TextEncoder();
             const bytes = encoder.encode(text);
             
-            let hex = Array.from(bytes)
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join(separator);
-            
-            if (casing === 'upper') {
-                hex = hex.toUpperCase();
-            }
+            const hex = Array.from(bytes)
+                .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+                .join('');
             
             document.getElementById('hexInput').value = hex;
         }
@@ -304,12 +298,14 @@
         }
 
         // Handle paste events to auto-detect input type
-        document.getElementById('hexInput').addEventListener('paste', () => {
-            setTimeout(hexToText, 0);
-        });
-        
-        document.getElementById('textInput').addEventListener('paste', () => {
-            setTimeout(textToHex, 0);
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('hexInput').addEventListener('paste', () => {
+                setTimeout(hexToText, 0);
+            });
+            
+            document.getElementById('textInput').addEventListener('paste', () => {
+                setTimeout(textToHex, 0);
+            });
         });
     </script>
 </body>
