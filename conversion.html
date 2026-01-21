@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hex ⇄ Text Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0d1117;
+            color: #e6edf3;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #58a6ff, #a371f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8b949e;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 700px) {
+            .converter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e6edf3;
+        }
+
+        .copy-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: #30363d;
+            color: #e6edf3;
+        }
+
+        .copy-btn.copied {
+            background: #238636;
+            border-color: #238636;
+            color: #fff;
+        }
+
+        textarea {
+            flex: 1;
+            min-height: 200px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #e6edf3;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            line-height: 1.6;
+            transition: border-color 0.2s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+
+        textarea::placeholder {
+            color: #484f58;
+        }
+
+        .error-msg {
+            color: #f85149;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            min-height: 1.2rem;
+        }
+
+        .options {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .clear-btn {
+            background: transparent;
+            border: 1px solid #f85149;
+            color: #f85149;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .clear-btn:hover {
+            background: #f85149;
+            color: #0d1117;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #484f58;
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hex ⇄ Text Converter</h1>
+        <p class="subtitle">Real-time conversion as you type</p>
+
+        <div class="converter-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">Text</span>
+                    <button class="copy-btn" onclick="copyText('textInput', this)">Copy</button>
+                </div>
+                <textarea 
+                    id="textInput" 
+                    placeholder="Type or paste text here..."
+                    oninput="textToHex()"
+                ></textarea>
+                <div class="error-msg" id="textError"></div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">Hexadecimal</span>
+                    <button class="copy-btn" onclick="copyText('hexInput', this)">Copy</button>
+                </div>
+                <textarea 
+                    id="hexInput" 
+                    placeholder="Type or paste hex here (e.g., 48 65 6c 6c 6f)..."
+                    oninput="hexToText()"
+                ></textarea>
+                <div class="error-msg" id="hexError"></div>
+            </div>
+        </div>
+
+        <div class="options">
+            <button class="clear-btn" onclick="clearAll()">Clear All</button>
+        </div>
+
+        <footer>
+            Built by <a href="https://michaelnovotny.dev" target="_blank">Michael Novotny</a>
+        </footer>
+    </div>
+
+    <script>
+        let lastEdited = null;
+
+        function textToHex() {
+            lastEdited = 'text';
+            const text = document.getElementById('textInput').value;
+            const separator = document.getElementById('separator').value;
+            const casing = document.getElementById('casing').value;
+            
+            document.getElementById('textError').textContent = '';
+            
+            if (!text) {
+                document.getElementById('hexInput').value = '';
+                return;
+            }
+
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(text);
+            
+            let hex = Array.from(bytes)
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join(separator);
+            
+            if (casing === 'upper') {
+                hex = hex.toUpperCase();
+            }
+            
+            document.getElementById('hexInput').value = hex;
+        }
+
+        function hexToText() {
+            lastEdited = 'hex';
+            const hexInput = document.getElementById('hexInput').value.trim();
+            const errorEl = document.getElementById('hexError');
+            
+            errorEl.textContent = '';
+            
+            if (!hexInput) {
+                document.getElementById('textInput').value = '';
+                return;
+            }
+
+            // Remove common separators and whitespace
+            const cleanHex = hexInput.replace(/[\s\-:,0x]/gi, '');
+            
+            // Validate hex string
+            if (!/^[0-9a-fA-F]*$/.test(cleanHex)) {
+                errorEl.textContent = 'Invalid characters in hex input';
+                return;
+            }
+            
+            if (cleanHex.length % 2 !== 0) {
+                errorEl.textContent = 'Hex string must have even length';
+                return;
+            }
+
+            try {
+                const bytes = new Uint8Array(
+                    cleanHex.match(/.{2}/g).map(byte => parseInt(byte, 16))
+                );
+                const decoder = new TextDecoder('utf-8', { fatal: false });
+                const text = decoder.decode(bytes);
+                document.getElementById('textInput').value = text;
+            } catch (e) {
+                errorEl.textContent = 'Error decoding hex: ' + e.message;
+            }
+        }
+
+        function copyText(elementId, btn) {
+            const textarea = document.getElementById(elementId);
+            const text = textarea.value;
+            
+            if (!text) return;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 1500);
+            });
+        }
+
+        function clearAll() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('hexInput').value = '';
+            document.getElementById('textError').textContent = '';
+            document.getElementById('hexError').textContent = '';
+            lastEdited = null;
+        }
+
+        // Handle paste events to auto-detect input type
+        document.getElementById('hexInput').addEventListener('paste', () => {
+            setTimeout(hexToText, 0);
+        });
+        
+        document.getElementById('textInput').addEventListener('paste', () => {
+            setTimeout(textToHex, 0);
+        });
+    </script>
+</body>
+</html>
